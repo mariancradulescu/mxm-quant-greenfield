@@ -1,0 +1,85 @@
+{
+  "schema": "mxm.broad-source-plus-cash-economic-development-20261031-public.v1",
+  "original_script_sha256": {
+    "source_aperture": "f209a13f1869a909afb5671752001923dee75a2e8b2f8fabfbb9c2717602c8e5",
+    "frozen_wick_first": "6623f221875496d936c4831cd227cc99075a0ce1dbdec18f7a87ae5b88700a08"
+  },
+  "original_full_public_json_sha256": {
+    "source_aperture": "bd2467eb218ce11b60aaea28ff025267f661cb097ce910741205e221ab962f98",
+    "frozen_wick_first": "26fd8dfef7136621b759e2453ace276975d0095abefa68e232554ce0048e0859"
+  },
+  "private_ledger_file_sha256": "4e2907d62484cd2a2aa361fe97fb39111d7752f4b94c45ea35f25c64c26b7e7e",
+  "private_canonical_ledger_sha256": "8348a88815996d5436ea1b2783381f7061a37a251b6df2a36cda16f291da0409",
+  "original_broker_zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+  "original_raw_source": {
+    "original_selected_series": 29,
+    "original_delta_series": 128,
+    "annual_series_verified_per_csv_sha256": 157,
+    "historical_quality_roster": 1576,
+    "broker_inventory": 5324,
+    "qualifying_original_M5_1h_time_pairs": 10965302
+  },
+  "source_price_monetary_scope": {
+    "quality_broker_symbol_id_exact_joins": 1576,
+    "source_1576_both_current_broker_min_ticket_access": 1576,
+    "both_under_200eur_minimum_margin_at_capture": 1575,
+    "both_under_80eur_current_director_margin_at_capture": 1530,
+    "source_longest_contiguous_run_at_least60_M5": 1284,
+    "older_depth_anchor_available": 253,
+    "original_annual_series": 157,
+    "usd_linear_minimum_ticket_scenario_eligible": 67,
+    "observed_p90_absolute_one_hour_gross_exceeds_assumed_fee_plus10bps": 59,
+    "also_exceeds_additional_0_20eur": 17
+  },
+  "first_frozen_distinct_m5_signal": {
+    "id": "BROAD_USD_MIN_TICKET_M5_WICK_REJECTION_FIRST_V1",
+    "closed": true,
+    "retuning_allowed": false,
+    "reference_market_price_only": "DEVELOPMENT_NOT_FORWARD_CONFIRMATION",
+    "source_window": "2026-01-05T00:00:00Z to 2026-09-14T00:00:00Z",
+    "source_identity_roster": "157 archived originals, price-blind min ticket USD commission captured and max native 80 EUR current DIRECTOR cap",
+    "qualifying_source_series": 62,
+    "source_classes": [
+      "Crypto Currency (Spot)",
+      "US Equities",
+      "Forex (Spot)",
+      "Energies (Spot)",
+      "Forwards - Indices"
+    ],
+    "signals": "Last completed M5 candle >55% lower/upper wick, closes at extreme opposite 25%; minimum past-only EUR wick value above dated fee plus 10bps hypothetical and additional EUR0.20",
+    "action": "Strict next M5 OPEN after 5min delay; one shared EUR200 account; at most one open position, 12 M5 bars fixed horizon; initial stop from prior H1 range clamped to EUR1.8, first adverse historical H/L stop, account reserve EUR120 and margin EUR80",
+    "original_proposals": 98,
+    "considered_decisions": 88,
+    "observed_conditional_entries": 88,
+    "censored_account_path": 0,
+    "closed_stops": 30,
+    "initial_capital_eur": 200,
+    "conditional_ending_cash_eur": 200.366702,
+    "conditional_net_eur": 0.366702,
+    "conditional_max_close_drawdown_eur": 18.796158,
+    "observed_weeks_with_entries": 34,
+    "positive_weeks": 19,
+    "weeks_with_at_least21_modeled_entries": 0,
+    "broker_confirmed_entries": 0,
+    "source_price_cash_net_by_class_eur": {
+      "Crypto Currency (Spot)": 0.363708,
+      "Energies (Spot)": -5.31126,
+      "US Equities": 5.314254
+    }
+  },
+  "cost_law": {
+    "declared_broker_snapshot": "2026-09-22, historical applicability unproven",
+    "illustrative_eur_per_usd": 0.9,
+    "illustrative_roundtrip_spread_slippage_bps": 10,
+    "min_ticket_linear_usd_payoff": "UNCERTIFIED_SCENARIO, not trusted native contract multiplier or historical settlement",
+    "funded_broker_account_certified": false,
+    "actual_executable_pnl_after_real_broker_costs_proven": false,
+    "robust_predictive_net_edge_proven": false,
+    "system_HARD21_broker_fills_proven": false
+  },
+  "final_decision": "CLOSE_EXACT_FIRST_WICK_POLICY_WITHOUT_RETUNING_OR_INVERSION; KEEP_ALL_PEPPRERSTONE_UNIVERSE_AVAILABLE; NO_DEPLOYMENT",
+  "orders": 0,
+  "cloud_activations": 0,
+  "protected_data_opened": false,
+  "reproducibility": "Full ORIGINAL executed Python and full public receipts are owner-side as MXM_BROAD_B_E_PUBLIC_ORIGINAL_REPRO_20261031.zip. Private per-episode ledger is NOT committed to GitHub. This repository stores hashed original receipts and condensed aggregates; CI does not rerun authenticated market data."
+}
