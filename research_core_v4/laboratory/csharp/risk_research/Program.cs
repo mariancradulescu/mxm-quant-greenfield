@@ -82,10 +82,12 @@ public static class Program {
    Need(args.Length==2,"ARGUMENTS");
    var data=File.ReadAllBytes(args[0]);
    Need(data.Length>0 && data.Length<=8000000,"INPUT_SIZE");
-   var r=JsonSerializer.Deserialize<StudyRequest>(data,Json);
-   Need(r!=null && r.Schema=="mxm.cold-risk-research.tape.v1" && r.InitialCapitalEur==200m &&
-    r.Episodes!=null && r.Episodes.Count>0 && r.Episodes.Count<=100000 &&
-    r.Policies!=null && r.Policies.Count==3,"SCHEMA_AND_CAPITAL");
+   StudyRequest? r=JsonSerializer.Deserialize<StudyRequest>(data,Json);
+   if(r is null || r.Episodes is null || r.Policies is null)
+    throw new ArgumentException("MXM_OFFLINE_RISK_MISSING_REQUEST_FIELDS");
+   Need(r.Schema=="mxm.cold-risk-research.tape.v1" && r.InitialCapitalEur==200m &&
+    r.Episodes.Count>0 && r.Episodes.Count<=100000 &&
+    r.Policies.Count==3,"SCHEMA_AND_CAPITAL");
    var validPolicies=r.Policies.All(p=>!string.IsNullOrWhiteSpace(p.Id) &&
     p.MaxMarginToFreeFraction>0m && p.MaxMarginToFreeFraction<=1m &&
     p.MinimumPostEntryFreeToEquityFraction>=0m && p.MinimumPostEntryFreeToEquityFraction<1m &&
