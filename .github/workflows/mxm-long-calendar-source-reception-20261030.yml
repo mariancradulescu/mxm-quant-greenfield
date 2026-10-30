@@ -1,0 +1,41 @@
+name: MXM primary145 annual calendar source-first reception
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/long_calendar_source_reception_20261030.py
+      - research_core_v4/laboratory/test_long_calendar_source_reception_20261030.py
+      - docs/economic-development/20261030/ANNUAL_TEMPORAL_SOURCE_RECEPTION.md
+      - .github/workflows/mxm-long-calendar-source-reception-20261030.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-long-calendar-source-reception-20261030.yml]
+permissions: {contents: read}
+jobs:
+  entire_annual_broker_source_semantics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Prove exact accepted annual/quarter/4-week catalog and M5 clock math
+        run: |
+          set -eu
+          python3 -m unittest research_core_v4.laboratory.test_long_calendar_source_reception_20261030 -v
+          mkdir -p verification/long-calendar-20261030
+          python3 -m research_core_v4.laboratory.long_calendar_source_reception_20261030 --mode inventory > verification/long-calendar-20261030/public-inventory.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open("verification/long-calendar-20261030/public-inventory.json"))
+          assert p['source_year']['identities']==145 and p['source_year']['distinct_asset_classes']==10
+          assert p['source_year']['per_identity_exact_weekly_coverage_proven'] is False
+          assert p['research_boundaries']['reserved_confirmation_opened'] is False
+          print('MXM_LONG_CALENDAR_AUTHENTICATED_METADATA_SEMANTICS_PASS')
+          PY
+      - name: Preserve public structural source receipt, not original price bars
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-annual-source-reception-${{ github.run_id }}
+          path: verification/long-calendar-20261030/public-inventory.json
+          if-no-files-found: error
+          retention-days: 90
