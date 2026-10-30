@@ -1,0 +1,61 @@
+name: MXM existing native CSharp H1 policy annual original source receipt
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/native_h1_csharp_annual_receipt.py
+      - research_core_v4/runtime_inputs/native_h1_annual_20261030/**
+      - docs/economic-development/20261030/PRIMARY145_NATIVE_H1_POLICY_DEVELOPMENT_REFERENCE.json
+      - docs/economic-development/20261030/MXM_NATIVE_H1_POLICY_ANNUAL_RECEIPT.md
+      - .github/workflows/mxm-native-h1-csharp-annual-20261030.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-native-h1-csharp-annual-20261030.yml]
+permissions: {contents: read}
+concurrency:
+  group: mxm-native-h1-csharp-original-first-receipt
+  cancel-in-progress: false
+jobs:
+  source-blind-csharp-build-and-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Preflight already existing CSharp offline policy without any source or private key
+        run: |
+          set -eu
+          python3 -m research_core_v4.laboratory.native_h1_csharp_annual_receipt selftest
+          dotnet build research_core_v4/laboratory/csharp/portfolio_policy/MxmPortfolioPolicy.csproj -c Release
+          python3 - <<'PY'
+          import hashlib,pathlib,json
+          p=pathlib.Path('research_core_v4/runtime_inputs/native_h1_annual_20261030')
+          blobs=sorted(p.glob('chunk-*.b64'))
+          assert len(blobs)==7 and all(z.stat().st_size>0 for z in blobs)
+          j=json.loads(pathlib.Path('docs/economic-development/20261030/PRIMARY145_NATIVE_H1_POLICY_DEVELOPMENT_REFERENCE.json').read_bytes())
+          assert j['proposals']==1229 and j['week_count']==35 and j['broker_bidask_cost_certified'] is False
+          print('MXM_H1_SOURCE_BLIND_RESEARCH_AND_CSHARP_COMPILE_PASS')
+          PY
+  original-annual-read-only-csharp-policy-reception:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    needs: source-blind-csharp-build-and-preflight
+    runs-on: ubuntu-24.04
+    environment: mxm-r3-custody-v1
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Run existing frozen CSharp policy against exact authenticated encrypted H1 derived originals, no broker or live orders
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.native_h1_csharp_annual_receipt protected
+      - name: Publish public aggregate and encrypted CSharp targets only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-original-native-csharp-h1-${{ github.run_id }}
+          path: verification/native-h1-csharp-20261030/
+          if-no-files-found: error
+          retention-days: 90
