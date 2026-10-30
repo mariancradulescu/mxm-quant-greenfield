@@ -289,7 +289,7 @@ public sealed partial class MxmReferenceProductBot : Robot {
    var view=book.Observation;
    if(!view.SessionOpen || view.Faulted || view.Events==0 ||
       view.Origin!=MxmObservationOrigin.NativeCallbackSnapshot ||
-      view.Shape!=MxmBookShapeKind.NonCrossed ||
+      !MxmBookShape.NonCrossed(view.Shape) ||
       !book.Bid.HasValue || !book.Ask.HasValue ||
       !view.BidAgeMs.HasValue || !view.AskAgeMs.HasValue ||
       view.BidAgeMs.Value>5000 || view.AskAgeMs.Value>5000)
