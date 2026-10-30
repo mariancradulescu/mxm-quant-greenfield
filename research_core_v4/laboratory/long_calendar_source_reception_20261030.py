@@ -114,7 +114,9 @@ def exact_clock(series):
     per=collections.defaultdict(lambda:collections.Counter())
     for t in times:
         d=dt.datetime.fromtimestamp(t,dt.timezone.utc)
-        if d.weekday()>4:continue
+        # The M5 source clock is instrument/session-native: weekends can be
+        # authentic for crypto. Non-trading days remain absent naturally;
+        # never manufacture a calendar or reject genuine broker bars by weekday.
         if not all(t-CLOCK*k in ts for k in range(LOOKBACK)):
             continue
         w=d.strftime('%G-W%V');q=per[w]
