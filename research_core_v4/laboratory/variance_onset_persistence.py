@@ -155,9 +155,13 @@ def evaluate(corpus,spec):
         bysymbol[str(sid)]={'count':len(x),
              'gross_bps_sum':sum(z['gross_bps'] for z in x),
              'coarse_after_cost_bps_sum':sum(z['gross_bps']-z['cost_bps'] for z in x)}
+    # The four original one-week capture segments start Thursday 20 August,
+    # end Wednesday 16 September. ISO W34 and W38 are *partial* and cannot
+    # be treated as full-week HARD21 observations.
+    full_weeks=('2026-W35','2026-W36','2026-W37')
     enough=(len(detail)>=spec['minimum_complete_decision_candidates'] and
             len(settled)>=spec['minimum_complete_trades'] and
-            all(weeks[w]['settled']>=21 for w in sorted(weeks)))
+            all(weeks[w]['settled']>=21 for w in full_weeks))
     # Even a positive scenario cannot prove profit: these are summed bps
     # over parallel different instruments without real cost or EUR200 funding.
     public={'schema':'mxm.variance-onset-frozen-first-result.v1','id':ID,
@@ -170,6 +174,8 @@ def evaluate(corpus,spec):
         'gross_positive_share':sum(z['gross_bps']>0 for z in settled)/len(settled) if settled else None,
         'cost_sensitive_gross_not_eur':True,'not_independent_confirmation':True,
         'minimum_source_and_trade_support':enough,
+        'full_iso_weeks_for_support':list(full_weeks),
+        'partial_iso_weeks_not_hard21_eligible':['2026-W34','2026-W38'],
         'weeks':{w:{'proposals':q['proposals'],'settled':q['settled'],
                    'censored':q['censored'],'gross_bps_sum':q['gross_bps_sum']}
                  for w,q in sorted(weeks.items())},
