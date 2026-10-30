@@ -27,7 +27,9 @@ jobs:
           python3 - <<'PY'
           import json
           x=json.load(open('/tmp/mxm-survivors-decision.json'))
-          assert x['max_same_iso_week_optimistic_combined_entries']==17
+          assert x['max_same_iso_week_recorded_accepted_entries_sum']==17
+          assert x['all_reported_rejected_entries']==3
+          assert x['max_weekly_optimistic_bound_including_all_rejections']==20
           assert x['all_overlapping_weeks_below_HARD21']
           assert x['new_economic_executions']==x['live_demo_orders']==x['cloud_activations']==0
           print("MXM_EXISTING_200_EUR_SURVIVORS_INSUFFICIENT_FOR_HARD21; NO_NEW_ECONOMIC_EXECUTION")
