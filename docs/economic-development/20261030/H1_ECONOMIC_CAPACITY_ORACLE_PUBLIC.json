@@ -354,5 +354,16 @@
     "system_HARD21_executed": false,
     "orders": 0
   },
-  "decision": "H1 8-FX at assumed 40bps cannot have weekly-positive >=21 entries even with perfect future information. At 20bps, 16/35 weekly upper bounds <=0. Positive oracle bound at <=10bps does NOT imply forecast skill. Move economic research toward wider broker universe, different holding periods and native cost evidence; never promote or tune oracle."
+  "decision": "H1 8-FX at assumed 40bps cannot have weekly-positive >=21 entries even with perfect future information. At 20bps, 16/35 weekly upper bounds <=0. Positive oracle bound at <=10bps does NOT imply forecast skill. Move economic research toward wider broker universe, different holding periods and native cost evidence; never promote or tune oracle.",
+  "independent_break_even_hindsight_top21_bps": {
+    "definition": "For all >=21 entries, the largest possible average gross future movement per entry is the average of the 21 largest per-hour eight-market absolute next-hour bps moves. This is a necessary upper bound on fixed per-entry roundtrip friction for a positive oracle week, not a broker cost quote.",
+    "minimum_week": "2025-W52",
+    "minimum": 14.214855866115082,
+    "median": 20.48287437446159,
+    "maximum": 33.105063271474194,
+    "weekly_break_even_exceeds_10bps": 35,
+    "weekly_break_even_exceeds_20bps": 19,
+    "weekly_break_even_exceeds_40bps": 0,
+    "independent_recalculation_performed_from_authenticated_tape": true
+  }
 }
