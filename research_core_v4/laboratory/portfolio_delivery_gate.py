@@ -71,6 +71,7 @@ def extract(result):
         equity = decimal(e['final_equity_eur'])
         dd = decimal(e['maximum_drawdown_eur'])
         count = e['executed_trades']
+        rejected = int(e['margin_blocked_trades'])
     else:
         b = result['base_path']
         stress = result['adverse_bar_stress_path']
@@ -80,6 +81,7 @@ def extract(result):
         counts = b['entries_by_iso_week']
         coverage = set(counts)
         count = b['accepted_entries']
+        rejected = int(b['rejected_entries'])
         need(sum(counts.values()) == count and
              stress['accepted_entries'] == count, 'C031_ENTRY_INVENTORY')
         net = decimal(b['terminal_broker_equity_eur'])-CAPITAL
@@ -87,7 +89,7 @@ def extract(result):
         dd = decimal(b['maximum_drawdown_eur'])
         max_margin = None
         free = decimal(b['minimum_free_margin_eur'])
-    need(count>=0 and all(isinstance(v,int) and v>=0 for v in counts.values()) and
+    need(count>=0 and rejected>=0 and all(isinstance(v,int) and v>=0 for v in counts.values()) and
          abs(equity-CAPITAL-net)<Decimal('0.000001'), 'ENTRIES_OR_ACCOUNT')
     margin_result = ('NECESSARY_MARGIN_CAP_FAIL' if max_margin is not None and
                      max_margin > TICKET_MARGIN_CAP else
@@ -96,7 +98,8 @@ def extract(result):
     reserve_result = ('OBSERVED_SCENARIO_FREE_RESERVE_FAIL' if free is not None and
                       free < MINIMUM_FREE_RESERVE else
                       'FREE_RESERVE_NOT_PROVEN' if free is None else 'RESERVE_NECESSARY_PASS_ONLY')
-    return {'id':ident,'count':count,'by_week':counts,'covered_weeks':coverage,
+    return {'id':ident,'count':count,'reported_rejections':rejected,
+            'by_week':counts,'covered_weeks':coverage,
             'net':net,'final_equity':equity,'max_drawdown':dd,
             'max_ticket_margin':max_margin,'minimum_free_margin':free,
             'ticket_margin_result':margin_result,'free_reserve_result':reserve_result}
@@ -116,23 +119,27 @@ def diagnose(items):
     need(window[0] == FIRST and window[-1] == LAST and
          all(set(window) <= d['covered_weeks'] for d in extracted.values()),
          'COMMON_OBSERVATION_WINDOW_INCOMPLETE')
-    # Unknown same-account collisions can REDUCE jointly accepted entries,
-    # never increase the count already logged on each separate scenario.
+    # Recorded accepted entries alone are NOT a universal future-account bound.
+    # Conservatively count EVERY separately reported rejected entry as if it
+    # could be accepted in ANY selected week. No new model/signals are invented.
+    all_reported_rejections=sum(d['reported_rejections'] for d in extracted.values())
     weeks = []
     for w in window:
         by = {k:d['by_week'].get(w,0) for k,d in extracted.items()}
         upper = sum(by.values())
         weeks.append({'iso_week':w,'separate_account_entry_counts':by,
-                      'optimistic_joint_entries_upper_bound':upper,
-                      'shortfall_to_HARD21_at_least':max(0,HARD21-upper)})
-    max_upper = max(w['optimistic_joint_entries_upper_bound'] for w in weeks)
+                      'recorded_accepted_entries_sum':upper,
+                      'absolute_bound_if_all_original_rejections_added':upper+all_reported_rejections,
+                      'shortfall_to_HARD21_at_least':max(0,HARD21-upper-all_reported_rejections)})
+    max_accepted = max(w['recorded_accepted_entries_sum'] for w in weeks)
+    max_upper = max(w['absolute_bound_if_all_original_rejections_added'] for w in weeks)
     peak_sum = sum(max(d['by_week'].values(), default=0) for d in extracted.values())
     status = 'CERTAINLY_BELOW_HARD21_FROM_FROZEN_CANDIDATES' if max_upper < HARD21 else 'UNRESOLVED_REQUIRES_TRUE_FUNDED_JOINT_REPLAY'
     per = {}
     for k,v in extracted.items():
         per[k]={'scenario_net_eur':str(v['net']),
                 'separate_scenario_final_equity_eur':str(v['final_equity']),
-                'executed_entries':v['count'],
+                'executed_entries':v['count'],'reported_rejected_entries':v['reported_rejections'],
                 'individual_peak_week_entries':max(v['by_week'].values(),default=0),
                 'maximum_drawdown_eur':str(v['max_drawdown']),
                 'maximum_reported_ticket_margin_eur':None if v['max_ticket_margin'] is None else str(v['max_ticket_margin']),
@@ -148,9 +155,11 @@ def diagnose(items):
             'overlapping_iso_weeks':[FIRST,LAST],
             'overlap_weeks_count':len(window),
             'peak_sum_even_if_on_different_weeks':peak_sum,
-            'max_same_iso_week_optimistic_combined_entries':max_upper,
+            'max_same_iso_week_recorded_accepted_entries_sum':max_accepted,
+            'all_reported_rejected_entries':all_reported_rejections,
+            'max_weekly_optimistic_bound_including_all_rejections':max_upper,
             'all_overlapping_weeks_below_HARD21':max_upper < HARD21,
-            'entry_count_aggregation':'UPPER_BOUND_ONLY_NOT_A_FUNDED_JOINT_PORTFOLIO',
+            'entry_count_aggregation':'UPPER_BOUND_FOR_FROZEN_RECORDED_ACCEPTED_AND_REJECTED_SIGNALS_ONLY; NOT_NEW_POLICIES_OR_NEW_SIGNALS; NOT_A_FUNDED_JOINT_PORTFOLIO',
             'separate_scenario_equity_and_net_must_never_be_added':True,
             'candidates':per,'weekly_upper_bounds':weeks,
             'historical_costs_and_fills_certified':False,
