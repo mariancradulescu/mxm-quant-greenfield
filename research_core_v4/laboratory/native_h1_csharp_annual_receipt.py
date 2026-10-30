@@ -127,7 +127,16 @@ def protected():
     with tempfile.TemporaryDirectory(prefix='mxm-native-h1-csharp-') as dirname:
         t=pathlib.Path(dirname);raw=decrypt(cipher,private.encode(),t)
         tape=json.loads(raw)
-        cmd=['dotnet','run','--project',str(DOTNET_PROJECT),'-c','Release','--',str(t/'input.json'),str(t/'native_targets.json')]
+        # Original-derived custodied tape encodes OHLC prices as decimal strings to
+        # preserve their exact textual identity. Existing C# CLI JsonElement.GetDecimal
+        # requires a JSON NUMBER, not a JSON STRING. Normalize only the H1 close
+        # field on a disposable runner-local copy; do not touch the signed source,
+        # future settlement observations, identity roster or signal specification.
+        native_input={'symbols':tape['symbols'],'bars':[
+            {'symbol':r['symbol'],'end':r['end'],'close':float(r['close']),
+             'available':r['available']} for r in tape['bars']]}
+        (t/'native_numeric_input.json').write_text(json.dumps(native_input,separators=(',',':')))
+        cmd=['dotnet','run','--project',str(DOTNET_PROJECT),'-c','Release','--',str(t/'native_numeric_input.json'),str(t/'native_targets.json')]
         subprocess.run(cmd,cwd=ROOT,check=True)
         output=(t/'native_targets.json').read_bytes()
         targets=json.loads(output)
