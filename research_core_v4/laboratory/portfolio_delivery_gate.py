@@ -95,7 +95,7 @@ def extract(result):
                      max_margin > TICKET_MARGIN_CAP else
                      'MARGIN_CAP_NOT_PROVEN' if max_margin is None else
                      'MARGIN_CAP_NECESSARY_PASS_ONLY')
-    reserve_result = ('OBSERVED_SCENARIO_FREE_RESERVE_FAIL' if free is not None and
+    reserve_result = ('OBSERVED_PATH_MIN_FREE_LT_120_ENTRY_COMPLIANCE_UNRESOLVED' if free is not None and
                       free < MINIMUM_FREE_RESERVE else
                       'FREE_RESERVE_NOT_PROVEN' if free is None else 'RESERVE_NECESSARY_PASS_ONLY')
     return {'id':ident,'count':count,'reported_rejections':rejected,
