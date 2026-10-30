@@ -1,0 +1,84 @@
+name: MXM one new authentic M5 OHLCV pooled economic screen
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/m5_pooled_volume_response.py
+      - research_core_v4/laboratory/test_m5_pooled_volume_response.py
+      - research_core_v4/laboratory/M5_POOLED_VOLUME_RESPONSE_20261030_V1.json
+      - docs/economic-development/20261030/M5_POOLED_VOLUME_FIRST_DECISION.md
+      - .github/workflows/mxm-m5-pooled-volume-20261030.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-m5-pooled-volume-20261030.yml]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  no-key-prospective-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Test causal M5 OHLCV feature/label split without source or secrets
+        run: |
+          set -eu
+          python3 -m unittest research_core_v4.laboratory.test_m5_pooled_volume_response -v
+          python3 -m research_core_v4.laboratory.m5_pooled_volume_response selftest
+  one-authentic-protected-development-evaluation:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    needs: no-key-prospective-tests
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Admit only one reviewed new-identity original-source evaluation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def get(p):return json.loads(subprocess.check_output(['gh','api',repo+p],text=True))
+          def need(c,k):
+              if not c:raise ValueError('MXM_M5_VOLUME_CUSTODY_'+k)
+          need(os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield' and
+               os.environ['GITHUB_EVENT_NAME']=='push' and
+               os.environ['GITHUB_REF']=='refs/heads/mxm-remediation-p0-p4-20261015-v1' and
+               os.environ['GITHUB_RUN_ATTEMPT']=='1','EXACT_LANE')
+          need(get('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA'],'HEAD_MOVED')
+          need(get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']=='a830c132521bd4348454653f713e04f6107484fe','OWNER_STOP_ANCHOR')
+          history=get('actions/workflows/mxm-m5-pooled-volume-20261030.yml/runs?per_page=100')
+          need(history['total_count']<=100 and history['total_count']==len(history['workflow_runs']),'COMPLETE_RUN_INVENTORY')
+          pushed=[r for r in history['workflow_runs'] if r['event']=='push']
+          need(len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID']) and
+               pushed[0]['head_sha']==os.environ['GITHUB_SHA'],'ONCE_PER_FROZEN_IDENTITY')
+          parents=get('commits/'+os.environ['GITHUB_SHA'])['parents']
+          need(len(parents)==2,'REVIEWED_MERGE_ONLY')
+          print('MXM_NEW_M5_IDENTITY_ADMITTED_FIRST_ECONOMIC_TRIAL_NOT_CLOSED_RETUNING')
+          PY
+      - name: Install exactly the existing pinned package set
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Decode the original SHA-pinned 100 shard Pepperstone M5 corpus and run the frozen model once
+        id: model
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.m5_pooled_volume_response protected
+      - name: Publish only the public conditional aggregate and encrypted private evidence
+        if: steps.model.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-first-m5-volume-response-${{ github.run_id }}
+          path: verification/m5-volume-response-20261030/
+          if-no-files-found: error
+          retention-days: 90
