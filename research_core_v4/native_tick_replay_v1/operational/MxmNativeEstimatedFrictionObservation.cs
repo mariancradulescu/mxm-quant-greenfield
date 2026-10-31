@@ -1,5 +1,6 @@
 using System;
 using cAlgo.API;
+using cAlgo.API.Internals;
 using Mxm.Replay;
 
 namespace cAlgo.Robots {
