@@ -503,6 +503,16 @@ public sealed partial class MxmReferenceProductBot : Robot {
     (decimal)EstimatedRoundTripFrictionReserveEur,nativeFee.BuyEur,nativeFee.SellEur)) {
    Print("MXM_NATIVE_FEE_EXCEEDS_DECLARED_FRICTION_RESERVE_HOLD");return;
   }
+  decimal? observedCostReserve=NativeObservedRoundTripRiskReserve(
+    instrument,units,nativeFee,feeBookBid,feeBookAsk);
+  if(!observedCostReserve.HasValue) {
+   Print("MXM_NATIVE_SPREAD_OR_RISK_COST_UNVERIFIED_SAFE_HOLD");return;
+  }
+  if(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
+    (decimal)initialFreeMargin,(decimal)margin,observedCostReserve.Value,
+    (decimal)MinimumFreeMarginReserveEur)) {
+   Print("MXM_FULL_CASH_COST_POST_ENTRY_RESERVE_HOLD");return;
+  }
   string admit=MxmCapitalAdmission.Check((decimal)initialEquity,(decimal)initialFreeMargin,
     (decimal)margin,nativeFee.PerSideCeilingEur,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
     accountOwned,MaxMxmAccountPositions);
@@ -534,17 +544,17 @@ public sealed partial class MxmReferenceProductBot : Robot {
   string stopRiskGate=MxmStopRiskAdmission.Check(
    (decimal)initialEquity,(decimal)existingRisk,(decimal)newStopRisk,
    (decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
-   (decimal)EstimatedRoundTripFrictionReserveEur,
-   (decimal)EstimatedRoundTripFrictionReserveEur*protectedExisting);
+   observedCostReserve.Value,
+   observedCostReserve.Value*protectedExisting);
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
   }
-  // Immutable OWNER absolute limits supplement configured percent/reserve.
+  // Current DIRECTOR-coded conservative absolute ceilings supplement configured percent/reserve.\n   // Their numbers are NOT immutable OWNER mandates; do not weaken them implicitly.
   // Native observed fees are estimates, not actual future fill charges;
   // EUR120 reserve and EUR2 proposed risk remain estimates, not guarantees.
   string ownerEnvelope=MxmOwnerEntryEnvelope.Check(
    (decimal)initialFreeMargin,(decimal)margin,nativeFee.PerSideCeilingEur,(decimal)newStopRisk,
-   (decimal)EstimatedRoundTripFrictionReserveEur);
+   observedCostReserve.Value);
   if(ownerEnvelope!=MxmOwnerEntryEnvelope.Admit) {
    Print("MXM_OWNER_ENTRY_ENVELOPE_HOLD_"+ownerEnvelope);return;
   }
@@ -581,6 +591,11 @@ public sealed partial class MxmReferenceProductBot : Robot {
    if(!MxmNativeCommission.StillCovered(nativeFee,latestFee)) {
     Print("MXM_NATIVE_FEE_INCREASED_BEFORE_ORDER_HOLD");return;
    }
+   decimal? finalCostReserve=NativeObservedRoundTripRiskReserve(
+     instrument,units,latestFee,instrument.Bid,instrument.Ask);
+   if(!finalCostReserve.HasValue || finalCostReserve.Value>observedCostReserve.Value) {
+    Print("MXM_FINAL_NATIVE_SPREAD_OR_COST_RISK_INCREASED_HOLD");return;
+   }
   }catch(Exception e) {
    Print("MXM_NATIVE_FEE_RECHECK_UNVERIFIED_HOLD_"+e.GetType().Name);return;
   }
@@ -607,6 +622,11 @@ public sealed partial class MxmReferenceProductBot : Robot {
    new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin,(decimal)finalMargin,(decimal)finalNewStopRisk,(decimal)finalExistingRisk));
   if(finalAccount!=MxmNativeFinalAccountFence.Admit) {
    Print("MXM_FINAL_ACCOUNT_CHANGE_HOLD_"+finalAccount);return;
+  }
+  if(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
+    (decimal)finalFreeMargin,(decimal)finalMargin,observedCostReserve.Value,
+    (decimal)MinimumFreeMarginReserveEur)) {
+   Print("MXM_FINAL_FULL_CASH_COST_POST_ENTRY_RESERVE_HOLD");return;
   }
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
@@ -766,13 +786,17 @@ public sealed partial class MxmReferenceProductBot : Robot {
      var fee=CurrentNativeCommission(symbol,candidate,symbol.Bid,symbol.Ask);
      if(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(
        friction,fee.BuyEur,fee.SellEur))return false;
+     decimal? costReserve=NativeObservedRoundTripRiskReserve(
+       symbol,candidate,fee,symbol.Bid,symbol.Ask);
+     if(!costReserve.HasValue || !MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
+       free,(decimal)margin,costReserve.Value,(decimal)MinimumFreeMarginReserveEur))return false;
      if(MxmCapitalAdmission.Check(equity,free,(decimal)margin,fee.PerSideCeilingEur,
        (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
        owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
      if(MxmStopRiskAdmission.Check(equity,(decimal)existingRisk,(decimal)risk,riskPercent,
-       friction,friction*protectedExisting)!=MxmStopRiskAdmission.Admit)return false;
+       costReserve.Value,costReserve.Value*protectedExisting)!=MxmStopRiskAdmission.Admit)return false;
      return MxmOwnerEntryEnvelope.Check(free,(decimal)margin,
-       fee.PerSideCeilingEur,(decimal)risk,friction)==MxmOwnerEntryEnvelope.Admit;
+       fee.PerSideCeilingEur,(decimal)risk,costReserve.Value)==MxmOwnerEntryEnvelope.Admit;
     }catch(Exception){return false;}
    });
    if(!chosen.HasValue) {

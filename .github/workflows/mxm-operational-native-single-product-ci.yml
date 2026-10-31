@@ -55,6 +55,23 @@ jobs:
       - name: Compile the only evolving native cTrader operational artifact with all existing safety shared kernels
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
+      - name: Verify native spread and both fee sides enter stop-loss cash reserve before any order
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/operational/MxmNativeEstimatedFrictionGuardFixture.csproj -c Release
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('research_core_v4/native_tick_replay_v1/operational/MxmReferenceProductBot.cs').read_text()
+          assert s.count('NativeObservedRoundTripRiskReserve(')>=3
+          assert 'costReserve.Value*protectedExisting' in s
+          assert s.count('observedCostReserve.Value')>=3
+          assert s.count('MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(')>=3
+          assert 'finalCostReserve.Value>observedCostReserve.Value' in s
+          assert 'MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers' in s
+          assert 'ExecuteMarketOrder(direction,instrumentName,units,Label,stopPips,null,requestComment)' in s
+          assert 'MXM_ENTRY_PERSISTENCE_ENVIRONMENT_UNQUALIFIED_SAFE_STOP' in s
+          assert 'MXM_BROKER_SPREAD_OR_RISK_COST' not in s
+          print('MXM_NATIVE_CASH_STOP_ADMISSION_REFERENCE_AND_RUNTIME_REGRESSION_PASS')
+          PY
       - name: Existing broker ambiguous order and native purpose fail closed checks
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmHistoricalOrderFixture.csproj -c Release
