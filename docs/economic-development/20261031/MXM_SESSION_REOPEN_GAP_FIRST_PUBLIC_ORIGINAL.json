@@ -1,0 +1,77 @@
+{
+  "cost_declarations": {
+    "additional_hypothetical_bps": 10.0,
+    "additional_slippage_allowance_eur": 0.1,
+    "contract_payout": "UNVERIFIED_LINEAR_UNITS_X_USD_PRICE_PROXY",
+    "funding": "NOT_RECONCILED",
+    "round_trip_native_usd_type2_min_volume_fee": "BROKER_2026_09_22_POST_SAMPLE_DECLARATION_NOT_HISTORICAL_FEE",
+    "usd_eur_conversion": "0.90 HYPOTHETICAL"
+  },
+  "decision": "FIRST_FROZEN_FIRST_OUTCOME_NO_RETUNE_NO_PROFIT_CLAIM_POSTDATE_BROKER_TERMS_COUNTERFACTUAL_ONLY",
+  "fixed_rule": {
+    "first_m5_bar_gap_correction_fraction": 0.1,
+    "gap_min_bps": 80.0,
+    "hold_m5_bars": 6,
+    "max_stop_loss_plus_modeled_cost_eur": 2.0,
+    "min_implied_gap_cash_after_cost_eur": 0.2,
+    "min_stop_frac_price": 0.0004,
+    "one_delayed_bar_after_first_5min_bar": true,
+    "reopen_gap_min_minutes": 60,
+    "stop_gap_fraction": 0.5
+  },
+  "fixed_window_utc": [
+    "2026-01-05T00:00:00Z",
+    "2026-09-14T00:00:00Z"
+  ],
+  "funded_scenario": {
+    "by_asset_class_conditional_pnl_eur": {
+      "Crypto Currency (Spot)": -0.051562,
+      "Energies (Spot)": -3.12924,
+      "US Equities": -2.758223
+    },
+    "conditional_net_cash_eur": -5.939025,
+    "confirmed_gap_signals": 177,
+    "distinct_instruments": 10,
+    "ending_cash_eur": 194.060975,
+    "evaluated_entries": 23,
+    "initial_cash_eur": 200.0,
+    "max_closed_equity_drawdown_eur": 6.029991,
+    "max_modeled_stop_plus_cost_eur": 1.99802,
+    "minimum_remaining_free_eur": 120.0,
+    "model_censored": 0,
+    "modeled_active_weeks": 21,
+    "modeled_stops": 3,
+    "modeled_weeks_with_at_least_21_entries": 0,
+    "positive_active_weeks": 6,
+    "proposal_count": 42,
+    "rejections": {
+      "entry_total_stop_loss_gt_existing_2eur": 9
+    },
+    "single_position": true,
+    "source_price_eligible_series_by_asset_class": {
+      "Crypto Currency (Spot)": 28,
+      "Energies (Spot)": 1,
+      "Forex (Spot)": 1,
+      "Forwards - Indices": 1,
+      "US Equities": 31
+    },
+    "ticket_margin_cap_eur": 80.0
+  },
+  "limitations": {
+    "LIVE_DEMO_orders": 0,
+    "actual_broker_fees": false,
+    "all_broker_universe_restricted": false,
+    "broker_actual_HARD21_entries": 0,
+    "closed_models_rerun": 0,
+    "contract_multiplier_verified": false,
+    "historical_executable_spread": false,
+    "native_cloud_reception": false,
+    "predictive_Net_robust_certified": false,
+    "real_historical_fx": false,
+    "stop_fill_order_execution_verified": false
+  },
+  "policy": "SESSION_REOPEN_PARTIAL_GAP_CORRECTION_ONE_FROZEN_FIRST_TRIAL_V1",
+  "schema": "mxm.session-reopen-gap-partial-correction-first-price-development-v1",
+  "source": "157 ORIGINAL ANNUAL M5 timeseries, source-qualified broker metadata; ALL source broker identities examined before price signal",
+  "source_partition": "EXPOSED_DEVELOPMENT_ONLY_NOT_PROTECTED_CONFIRMATION"
+}
