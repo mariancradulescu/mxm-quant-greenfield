@@ -1,0 +1,47 @@
+{
+  "schema": "mxm.native-operational-cash-stop-cost-1576-broker-fee-scope.v1",
+  "date_utc": "2026-10-31",
+  "source": {
+    "original_readonly_broker_zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+    "source_m5_quality_population": 1576,
+    "original_full_private_report_sha256": "7d5c442dac8cc7a3da31fde711f99e1f97eb29b8b35d9a4ab53166b3fc62d6ae",
+    "original_executed_source_sha256": "0e9c2ea288fdc6cb0b0761924aa88c1a9f22291a0c067ca08e88a93fbf2d2244",
+    "github_executed_source_identical_blob_sha1": "67d66e0949724580baef76aa219104c7c805c175"
+  },
+  "broker_margin_and_declared_fee_snapshot": {
+    "fully_matched_M5_symbols": 1576,
+    "minimum_buy_sell_margin_within_initial_200_eur": 1575,
+    "minimum_buy_sell_margin_within_existing_director80_eur": 1530,
+    "usd_quoted_type2_fee_scenario_qualified": 873,
+    "unpriced_by_this_very_specific_USD_fee_path": 657,
+    "scoped_fee_eur_round_trip_median": "0.0360",
+    "scoped_fee_eur_round_trip_max": "0.0540",
+    "fixed_0_20_eur_fee_reserve_covers_fee_only": 873,
+    "usd_to_eur_rate": "0.90 - ILLUSTRATIVE NOT REAL HISTORICAL FX",
+    "actual_spread_or_slippage_supported": false,
+    "actual_payoff_multiplier_or_stop_risk_supported": false
+  },
+  "operational_CSharp_changes": {
+    "single_robot": true,
+    "historical_pinned_research_files_unchanged": true,
+    "conservative_roundtrip_reserve_floor": "max(configured reserve, 2*max(current buy/sell estimated fees) + cTrader native observed spread cash risk + explicit additional slippage cushion EUR)",
+    "applies_to": [
+      "broker-lattice volume pre-sizing",
+      "same account after prepared durable intent",
+      "final native fee/quote recheck before broker submission"
+    ],
+    "unknown_cost_or_increase": "FAIL_CLOSED",
+    "native_min_ticket_read_only_headroom": "coded current stop cap minus native stop estimate minus observed spread cash minus explicit extra slippage cushion; NOT fee estimate",
+    "future_execution_fees_bounded": false,
+    "hard21_actual": false,
+    "cloud_recovery_certified": false,
+    "live_demo_orders": 0,
+    "cloud_activation": 0
+  },
+  "economic_evaluation": {
+    "additional_new_signal_trials": 0,
+    "previous_closed_negative_model_restarted": false,
+    "robust_NET_proven": false
+  },
+  "decision": "Prospective models must price stop+fees+observed spread+slippage before admission; retaining unchanged prior EUR80/120/2 runtime gates and one continuous EUR200 account; no retrospective exclusion of 1576 or 5324 broker universe"
+}
