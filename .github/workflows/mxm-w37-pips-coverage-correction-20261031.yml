@@ -1,0 +1,69 @@
+name: MXM W37 corrected historical pip scale and coverage cause receipt
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/w37_authentic_spread_cash_20261031.py
+      - .github/workflows/mxm-w37-pips-coverage-correction-20261031.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-w37-pips-coverage-correction-20261031.yml
+permissions: {contents: read}
+concurrency:
+  group: mxm-w37-corrected-units-original-diagnostic-once-20261031
+  cancel-in-progress: false
+jobs:
+  source-blind-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Confirm native 1e5 historical scale, 10 raw/pip, monetary scale-cancel and fail-closed quote rules
+        run: |
+          python3 -m py_compile research_core_v4/laboratory/w37_authentic_spread_cash_20261031.py
+          python3 -m research_core_v4.laboratory.w37_authentic_spread_cash_20261031 selftest
+  exact-original-read-only-correction:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    needs: source-blind-regression
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: mxm-r3-custody-v1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
+      - name: Restore exact ORIGINAL W37 ciphers without broker calls or any additional data
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          mkdir -p "${RUNNER_TEMP}/mxm-w37-units"
+          python3 -m research_core_v4.laboratory.durable_week_chronology --out "${RUNNER_TEMP}/mxm-w37-units/eur-original"
+          python3 -m research_core_v4.laboratory.durable_gbpusd_week37_chronology --out "${RUNNER_TEMP}/mxm-w37-units/gbp-original"
+          cp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/usd_pair_native_reception.py research_core_v4/laboratory/usd_pair_alignment.py .sealed-chronology-source/research_core_v4/laboratory/
+      - name: Verify original native history and read quotes only within protected R3 custody
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          cd .sealed-chronology-source
+          python3 -m research_core_v4.laboratory.usd_pair_native_reception export EURUSD "${RUNNER_TEMP}/mxm-w37-units/eur-original/capture.mxmenc" "${RUNNER_TEMP}/mxm-w37-units/eur.ndjson"
+          python3 -m research_core_v4.laboratory.usd_pair_native_reception export GBPUSD "${RUNNER_TEMP}/mxm-w37-units/gbp-original/capture.mxmenc" "${RUNNER_TEMP}/mxm-w37-units/gbp.ndjson"
+      - name: Check V1 unchanged money/bps/coverage; report corrected pips and diagnosed missingness on same original events
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.w37_authentic_spread_cash_20261031 original --eur "${RUNNER_TEMP}/mxm-w37-units/eur.ndjson" --gbp "${RUNNER_TEMP}/mxm-w37-units/gbp.ndjson" --out verification/w37-pips-coverage-correction-20261031/public-v2.json
+      - name: Store only corrected public aggregates, not original BIDASK quote records or decryption keys
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-w37-corrected-pips-and-coverage-${{ github.run_id }}
+          path: verification/w37-pips-coverage-correction-20261031/public-v2.json
+          if-no-files-found: error
+          retention-days: 90
