@@ -13,4 +13,14 @@ Check(!F(.20m,-.01m,.06m,.27m,.10m).HasValue,"NO_NEGATIVE_FEE");
 Check(!F(.20m,.05m,.06m,.27m,-.01m).HasValue,"NO_NEGATIVE_SLIP");
 Check(!F(.20m,.05m,.06m,decimal.MaxValue,.10m).HasValue,"COST_OVERFLOW_SAFE_HOLD");
 Check(!F(decimal.MaxValue,decimal.MaxValue,0m,0m,0m).HasValue,"COMMISSION_OVERFLOW_SAFE_HOLD");
+Check(MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,79m,.49m,120m),
+ "CASH_RESERVED_FOR_FULL_ROUNDTRIP_COST_AND_MARGIN");
+Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,80m,.49m,120m),
+ "FEE_ONLY_MARGIN_ADMISSION_WOULD_BE_UNSAFE");
+Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,79m,1.50m,120m),
+ "CASH_COST_EATS_FREE_MARGIN");
+Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,0m,.49m,120m),
+ "NO_ZERO_BROKER_MARGIN");
+Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,79m,-.01m,120m),
+ "NO_NEGATIVE_COST_GUESS");
 Console.WriteLine("MXM_NATIVE_OBSERVED_SPREAD_PLUS_BOTH_FEES_EUR_STOP_RISK_GUARD_PASS_NO_ORDERS");
