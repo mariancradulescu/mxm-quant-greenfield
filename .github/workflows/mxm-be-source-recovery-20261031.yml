@@ -1,0 +1,49 @@
+name: MXM B-E existing R3 source custody recovery receipt
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/source_recovery_receipt_20261031.py
+      - .github/workflows/mxm-be-source-recovery-20261031.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-source-recovery-20261031.yml
+permissions: {contents: read}
+concurrency:
+  group: mxm-be-original-custody-recovery-one-shot-20261031
+  cancel-in-progress: false
+jobs:
+  source-blind-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Check existing original source identity without secrets or outcomes
+        run: |
+          python3 -m research_core_v4.laboratory.source_recovery_receipt_20261031 selftest
+  original-r3-source-recovery:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    needs: source-blind-contract
+    runs-on: ubuntu-24.04
+    environment: mxm-r3-custody-v1
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Authenticate all 100 old release assets and decrypt exactly one original R3 shard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.source_recovery_receipt_20261031 protected
+      - name: Save public source-access receipt without private market rows
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-r3-source-recovered-${{ github.run_id }}
+          path: verification/be-original-custody-recovery-20261031/public.json
+          if-no-files-found: error
+          retention-days: 90
