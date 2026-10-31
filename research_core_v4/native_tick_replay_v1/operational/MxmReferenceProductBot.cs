@@ -508,6 +508,11 @@ public sealed partial class MxmReferenceProductBot : Robot {
   if(!observedCostReserve.HasValue) {
    Print("MXM_NATIVE_SPREAD_OR_RISK_COST_UNVERIFIED_SAFE_HOLD");return;
   }
+  if(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
+    (decimal)initialFreeMargin,(decimal)margin,observedCostReserve.Value,
+    (decimal)MinimumFreeMarginReserveEur)) {
+   Print("MXM_FULL_CASH_COST_POST_ENTRY_RESERVE_HOLD");return;
+  }
   string admit=MxmCapitalAdmission.Check((decimal)initialEquity,(decimal)initialFreeMargin,
     (decimal)margin,nativeFee.PerSideCeilingEur,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
     accountOwned,MaxMxmAccountPositions);
@@ -617,6 +622,11 @@ public sealed partial class MxmReferenceProductBot : Robot {
    new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin,(decimal)finalMargin,(decimal)finalNewStopRisk,(decimal)finalExistingRisk));
   if(finalAccount!=MxmNativeFinalAccountFence.Admit) {
    Print("MXM_FINAL_ACCOUNT_CHANGE_HOLD_"+finalAccount);return;
+  }
+  if(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
+    (decimal)finalFreeMargin,(decimal)finalMargin,observedCostReserve.Value,
+    (decimal)MinimumFreeMarginReserveEur)) {
+   Print("MXM_FINAL_FULL_CASH_COST_POST_ENTRY_RESERVE_HOLD");return;
   }
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
@@ -778,7 +788,8 @@ public sealed partial class MxmReferenceProductBot : Robot {
        friction,fee.BuyEur,fee.SellEur))return false;
      decimal? costReserve=NativeObservedRoundTripRiskReserve(
        symbol,candidate,fee,symbol.Bid,symbol.Ask);
-     if(!costReserve.HasValue)return false;
+     if(!costReserve.HasValue || !MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
+       free,(decimal)margin,costReserve.Value,(decimal)MinimumFreeMarginReserveEur))return false;
      if(MxmCapitalAdmission.Check(equity,free,(decimal)margin,fee.PerSideCeilingEur,
        (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
        owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
