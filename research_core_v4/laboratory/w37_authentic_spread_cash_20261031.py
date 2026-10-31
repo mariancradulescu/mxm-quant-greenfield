@@ -14,6 +14,7 @@ import hashlib
 import heapq
 import io
 import itertools
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from .usd_pair_native_reception import SOURCES, START, END
@@ -22,6 +23,9 @@ GRID_MS = 300000
 MAX_AGE_MS = 5000
 REFERENCE_BASE_UNITS = 1000
 SYMBOLS = ("EURUSD", "GBPUSD")
+NATIVE_HISTORICAL_PRICE_SCALE = 100000
+FX_PIP_POSITION = 4
+RAW_UNITS_PER_PIP = NATIVE_HISTORICAL_PRICE_SCALE // 10**FX_PIP_POSITION
 
 def need(condition, tag):
     if not condition:
@@ -61,7 +65,8 @@ def book_at(book, symbol, t):
 def signed_spread_cash(symbol_book, eur_book):
     """USD spread for exactly 1k BASE units, converted using observed EURUSD BID.
 
-    Raw prices share exact native EURUSD/GBPUSD digits=5, transport scale 1e7.
+    Raw prices share native EURUSD/GBPUSD digits=5; historical scale 1e5.
+    Cash ratio cancels the common native price-scale exactly.
     USD expense / observed EURUSD BID is conservative for USD liabilities.
     The reference units are NOT a broker-verified executable minimum volume.
     """
@@ -69,7 +74,7 @@ def signed_spread_cash(symbol_book, eur_book):
     eur_bid,_=eur_book
     need(ask>bid>0 and eur_bid>0,"CASH_CONTRACT")
     eur=(Decimal(REFERENCE_BASE_UNITS)*Decimal(ask-bid)/Decimal(eur_bid))
-    pips=Decimal(ask-bid)/Decimal(1000)
+    pips=Decimal(ask-bid)/Decimal(RAW_UNITS_PER_PIP)
     bps=Decimal(20000)*Decimal(ask-bid)/Decimal(ask+bid)
     return eur,pips,bps
 
@@ -160,7 +165,13 @@ def monetary_report(eur_path, gbp_path, *, source_prevalidated=False):
             "hour_utc_available_samples":{str(h):len(z) for h,z in sorted(hours[sym].items())},
             "hour_utc_spread_eur_median":{str(h):rounded(percentile(z,50)) for h,z in sorted(hours[sym].items())}}
     return {
-        "schema":"mxm.w37.original.bidask.money-spread-support.v1",
+        "schema":"mxm.w37.original.bidask.money-spread-support.v2-corrected-pips", 
+        "supersedes_original_receipt": {"original_run":41227762678,"original_artifact_id":13052347106,
+            "original_code_blob_sha1":"4f915a8c19bc5358925a7516d5010f00bf71029e",
+            "original_receipt_frozen_unchanged":True,"pip_units_only_correction":True},
+        "historical_raw_price_scale":NATIVE_HISTORICAL_PRICE_SCALE,
+        "pip_position":FX_PIP_POSITION,
+        "raw_units_per_pip":RAW_UNITS_PER_PIP,
         "partition":"EXPOSED_DEVELOPMENT_2026_W37_ONLY",
         "week":["2026-09-07T00:00:00Z","2026-09-14T00:00:00Z"],
         "grid_minutes":5,"grids_in_week":2016,
@@ -169,7 +180,7 @@ def monetary_report(eur_path, gbp_path, *, source_prevalidated=False):
         "same_timestamp_updates_atomic":True,
         "simultaneous_symbols":list(SYMBOLS),
         "reference_base_units":REFERENCE_BASE_UNITS,
-        "cash_conversion":"actual strict-prior EURUSD BID native raw quote for USD liability; price-scale 1e7",
+        "cash_conversion":"actual strict-prior EURUSD BID native raw quote for USD liability; historical raw price-scale 1e5 cancels in raw ratio",
         "data":out,
         "broker_spread_cost_observed_not_executable":True,
         "historical_arrival_order_proven":False,
@@ -184,20 +195,123 @@ def monetary_report(eur_path, gbp_path, *, source_prevalidated=False):
     }
 
 def selftest():
-    # Exact price-scale/cash sign: 100 raw ticks = 0.1 pip = ~0.009 EUR per 1k.
-    a=signed_spread_cash((11000000,11000100),(11000000,11000100))
-    need(a[0]==Decimal(100000)/Decimal(11000000) and a[1]==Decimal("0.1"),"MONEY_SCALE")
-    b={"EURUSD":{"bid":(11000000,START+GRID_MS-10),"ask":(11000100,START+GRID_MS-10)}}
+    # Official Open API: raw/100000; pipPosition=4 => 10 raw units = 1 pip.
+    need(RAW_UNITS_PER_PIP==10,"OFFICIAL_PIP_SCALE")
+    a=signed_spread_cash((110000,110010),(110000,110010))
+    need(a[0]==Decimal(10000)/Decimal(110000) and a[1]==Decimal("1"),"MONEY_SCALE")
+    b={"EURUSD":{"bid":(110000,START+GRID_MS-10),"ask":(110010,START+GRID_MS-10)}}
     got,reason=book_at(b,"EURUSD",START+GRID_MS)
-    need(reason=="READY" and got==(11000000,11000100),"STRICT_CAUSAL")
+    need(reason=="READY" and got==(110000,110010),"STRICT_CAUSAL")
     need(book_at(b,"EURUSD",START+GRID_MS-11)[1]=="NOT_STRICT_PRIOR","FUTURE_OBSERVATION_REJECTED")
     need(book_at(b,"EURUSD",START+GRID_MS+6000)[1]=="STALE","STALE_REJECTED")
-    b["EURUSD"]["ask"]=(11000000,START+GRID_MS-10)
+    b["EURUSD"]["ask"]=(110000,START+GRID_MS-10)
     need(book_at(b,"EURUSD",START+GRID_MS)[1]=="LOCKED_OR_CROSSED","LOCKED_REJECTED")
     b["EURUSD"]["ask"]=(None,START+GRID_MS-10)
     need(book_at(b,"EURUSD",START+GRID_MS)[1]=="CONFLICT","SAME_MS_AMBIGUITY")
     need(percentile([Decimal(1),Decimal(2),Decimal(3)],50)==2,"MEDIAN")
+    small=signed_spread_cash((110000,110001),(110000,110001))
+    need(small[1]==Decimal("0.1") and small[0]==Decimal(1000)/Decimal(110000),"ONE_RAW_UNIT_IS_TENTH_PIP")
+    need(small[2]==Decimal(20000)/Decimal(220001),"BPS_UNCHANGED")
+    need(signed_spread_cash((110000,110020),(110000,110001))[1]==Decimal("2"),"TWO_PIPS")
     print("MXM_AUTHENTIC_SPREAD_SOURCE_BLIND_CASH_CAUSAL_TESTS_PASS")
+
+
+# The immutable original public result from Actions #41227762678 is an input
+# invariant, NOT overwritten. Only pips, semantic scale labels and diagnostics
+# may differ in v2; EUR, bps and the original 2016-slot reason counts must match.
+ORIGINAL_PUBLIC_AGGREGATES = {
+    "EURUSD": {
+        "eur":{"median":"0.008607","p90":"0.025872","max":"1.058128"},
+        "bps":"0.086068","valid":305,"corrected_pips":"0.100000",
+        "unavailable":{"LOCKED_OR_CROSSED":836,"MISSING":1,"STALE":874}},
+    "GBPUSD": {
+        "eur":{"median":"0.017211","p90":"0.043021","max":"1.419440"},
+        "bps":"0.147848","valid":255,"corrected_pips":"0.200000",
+        "unavailable":{"EURUSD_FX_LOCKED_OR_CROSSED":699,"EURUSD_FX_STALE":197,
+                       "LOCKED_OR_CROSSED":173,"MISSING":1,"STALE":691}}
+}
+
+def coverage_diagnostics(eur_path,gbp_path):
+    """Diagnose missingness with the SAME original 5-second strict-prior rule.
+
+    Exposes only aggregate counts, not reconstructed raw quote prices or stamps.
+    A bid/ask inversion between different side timestamps is NOT proof of a
+    simultaneously crossed broker book or actual historical arrival order.
+    """
+    paths={"EURUSD":Path(eur_path),"GBPUSD":Path(gbp_path)}
+    book={sym:{} for sym in SYMBOLS}
+    totals={sym:collections.Counter() for sym in SYMBOLS}
+    weekday={sym:collections.defaultdict(collections.Counter) for sym in SYMBOLS}
+    byhour={sym:collections.defaultdict(collections.Counter) for sym in SYMBOLS}
+    status={sym:collections.Counter() for sym in SYMBOLS}
+    lag={sym:collections.Counter() for sym in SYMBOLS}
+    age={sym:collections.Counter() for sym in SYMBOLS}
+    conflicts=collections.Counter()
+    next_sample=START
+
+    def sample(t):
+        fx,fx_reason=book_at(book,"EURUSD",t)
+        day=str(datetime.fromtimestamp(t/1000,timezone.utc).weekday())
+        hour=str(datetime.fromtimestamp(t/1000,timezone.utc).hour)
+        for sym in SYMBOLS:
+            pair,why=book_at(book,sym,t)
+            code=why if pair is None else ("EURUSD_FX_"+fx_reason if fx is None else "READY")
+            totals[sym][code]+=1
+            weekday[sym][day][code]+=1
+            byhour[sym][hour][code]+=1
+            if "bid" in book[sym] and "ask" in book[sym]:
+                bid,bt=book[sym]["bid"];ask,at=book[sym]["ask"]
+                if bid is not None and ask is not None:
+                    skew=abs(bt-at)
+                    lag[sym]["same_side_timestamp" if skew==0 else
+                             "side_timestamp_skew_1_to_100ms" if skew<=100 else
+                             "side_timestamp_skew_101_to_1000ms" if skew<=1000 else
+                             "side_timestamp_skew_over_1000ms"]+=1
+                    oldest=t-min(bt,at)
+                    age[sym]["age_0_to_5000ms" if oldest<=5000 else
+                             "age_5001_to_60000ms" if oldest<=60000 else
+                             "age_over_60000ms"]+=1
+                    if why=="LOCKED_OR_CROSSED":
+                        status[sym]["equal_bid_ask" if ask==bid else "ask_below_bid"]+=1
+                        status[sym]["same_timestamp" if at==bt else "asynchronous_side_timestamp"]+=1
+                        status[sym]["side_skew_over_1000ms" if skew>1000 else "side_skew_at_most_1000ms"]+=1
+
+    with paths["EURUSD"].open() as eh,paths["GBPUSD"].open() as gh:
+        ordered=heapq.merge(source_stream(eh,"EURUSD"),source_stream(gh,"GBPUSD"))
+        for t,group in itertools.groupby(ordered,key=lambda x:x[0]):
+            while next_sample<=t and next_sample<END:
+                sample(next_sample);next_sample+=GRID_MS
+            byside=collections.defaultdict(set)
+            for _,sym,side,raw in group: byside[sym,side].add(raw)
+            for (sym,side),values in byside.items():
+                if len(values)>1:conflicts[sym]+=1
+                book[sym][side]=(next(iter(values)) if len(values)==1 else None,t)
+        while next_sample<END:
+            sample(next_sample);next_sample+=GRID_MS
+
+    result={}
+    for sym in SYMBOLS:
+        need(sum(totals[sym].values())==2016,"DIAGNOSTIC_WEEK_COMPLETENESS_"+sym)
+        need(sum(sum(v.values()) for v in weekday[sym].values())==2016,"DIAGNOSTIC_DAYS_"+sym)
+        need(sum(sum(v.values()) for v in byhour[sym].values())==2016,"DIAGNOSTIC_HOURS_"+sym)
+        need(conflicts[sym]==0,"NATIVE_ATOMIC_SOURCE_CONFLICT_REAPPEARED_"+sym)
+        need(status[sym]["equal_bid_ask"]+status[sym]["ask_below_bid"]==
+             totals[sym]["LOCKED_OR_CROSSED"],"CROSSING_CLASSIFICATION_"+sym)
+        result[sym]={
+           "reasons":dict(totals[sym]),
+           "weekday_utc_reasons":{str(k):dict(v) for k,v in sorted(weekday[sym].items())},
+           "hour_utc_reasons":{str(k):dict(v) for k,v in sorted(byhour[sym].items(),key=lambda z:int(z[0]))},
+           "book_shape_within_fresh_5s":dict(status[sym]),
+           "last_side_timestamp_lag_all_recorded_grid":dict(lag[sym]),
+           "oldest_side_age_all_recorded_grid":dict(age[sym]),
+           "same_ms_atomic_conflicts":conflicts[sym],
+           "conclusions": {
+              "locked_or_crossed_are_merged_in_original":True,
+              "nonzero_side_skew_is_not_same_timestamp_broker_cross":True,
+              "staleness_censored_not_free_spread":True,
+              "no_broker_arrival_order_or_execution_certified":True}
+        }
+    return result
 
 def main():
     p=argparse.ArgumentParser()
@@ -210,6 +324,16 @@ def main():
     if a.mode=="original":
         need(a.eur and a.gbp and a.out,"PRIVATE_ORIGINAL_ARGS_REQUIRED")
         receipt=monetary_report(a.eur,a.gbp,source_prevalidated=True)
+        receipt["coverage_diagnostics"]=coverage_diagnostics(a.eur,a.gbp)
+        for symbol,legacy in ORIGINAL_PUBLIC_AGGREGATES.items():
+            row=receipt["data"][symbol]
+            need(row["observed_1000_units_spread_eur"]==legacy["eur"] and
+                 row["observed_spread_bps_median"]==legacy["bps"] and
+                 row["complete_native_strict_prior_samples"]==legacy["valid"] and
+                 row["unavailable"]==legacy["unavailable"] and
+                 row["observed_spread_pips_median"]==legacy["corrected_pips"],"ORIGINAL_CASH_BPS_AND_COVERAGE_UNCHANGED_"+symbol)
+            need(receipt["coverage_diagnostics"][symbol]["reasons"]==
+                 {"READY":legacy["valid"],**legacy["unavailable"]},"DIAGNOSTIC_REASON_PARITY_"+symbol)
         a.out.parent.mkdir(parents=True,exist_ok=True)
         need(not a.out.exists(),"NO_RESULT_OVERWRITE")
         a.out.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
