@@ -36,6 +36,10 @@ jobs:
           assert 'if(phase=="BAR_CALLBACK")ReportNativeMinimumTicketAperture();' in working.read_text()
           helper=extra.read_text()
           assert 'nativeRun.IsObserving' in helper and 'expectedNetEUR=UNKNOWN' in helper
+          assert 'MXM_NATIVE_MIN_TICKET_DECLARED_FEE_TERMS' in helper
+          assert 'historicalPeriodAligned=false commissionSettledEUR=UNKNOWN' in helper
+          assert 'symbol.CommissionType' in helper and 'symbol.MinCommissionType' in helper
+          assert 'symbol.MinCommissionAsset?.Name' in helper and 'Server.TimeInUtc' in helper
           assert all(s not in helper for s in ('ExecuteMarketOrder','PlaceLimitOrder','PlaceStopOrder','ClosePosition(','ModifyPosition(','CancelPendingOrder(','LocalStorage','HttpClient'))
           product=ET.parse(root/'research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj').getroot()
           historical=ET.parse(root/'research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj').getroot()

@@ -61,6 +61,14 @@ public sealed partial class MxmReferenceProductBot {
       Math.Max(view.BidAgeMs.Value,view.AskAgeMs.Value),status);
    // Separate receipt, purpose-latched read-only: not a fee, fill or a
    // time-stamped certified EUR settlement price.
+   // Native broker-declared symbol fee terms, sampled at this callback.
+   // Raw current *terms* are not a charge, a verified historical commission,
+   // a EUR asset conversion or a guaranteed future execution cost.
+   // This adds no broker request, order, storage or network side effect.
+   Print("MXM_NATIVE_MIN_TICKET_DECLARED_FEE_TERMS symbol={0} nativeCommissionType={1} nativeCommissionRate={2} nativeMinCommissionType={3} nativeMinCommission={4} nativeMinCommissionAsset={5} nativeQuoteAsset={6} nativeLotSize={7} minVolumeUnits={8} callbackUtc={9:O} historicalPeriodAligned=false commissionSettledEUR=UNKNOWN costFxLease=false accountMutation=false",
+      symbol.Name,symbol.CommissionType,symbol.Commission,
+      symbol.MinCommissionType,symbol.MinCommission,symbol.MinCommissionAsset?.Name??"",
+      symbol.QuoteAsset?.Name??"",symbol.LotSize,min,Server.TimeInUtc);
    Print("MXM_NATIVE_MIN_TICKET_PIP_CASH_ESTIMATE symbol={0} volumeUnits={1} observedSpreadPips={2:F5} nativeCashPerPipEUR={3:F6} nativeObservedSpreadRiskEUR={4:F6} profitForecastEUR=UNKNOWN commissionEUR=UNKNOWN slippageEUR=UNKNOWN payoffVerified=false accountMutation=false",
       symbol.Name,min,spreadPips,cashPerPip,spreadCashEstimate);
    // Economic readback for ALL observed asset classes, not an instrument
