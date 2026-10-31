@@ -13,6 +13,14 @@ Check(!F(.20m,-.01m,.06m,.27m,.10m).HasValue,"NO_NEGATIVE_FEE");
 Check(!F(.20m,.05m,.06m,.27m,-.01m).HasValue,"NO_NEGATIVE_SLIP");
 Check(!F(.20m,.05m,.06m,decimal.MaxValue,.10m).HasValue,"COST_OVERFLOW_SAFE_HOLD");
 Check(!F(decimal.MaxValue,decimal.MaxValue,0m,0m,0m).HasValue,"COMMISSION_OVERFLOW_SAFE_HOLD");
+decimal? Sum(params decimal?[] xs)=>MxmNativeEstimatedFrictionGuard.SumExistingPositionCostFloors(xs);
+Check(Sum(.37m,.91m)==1.28m,"DIFFERENT_EXISTING_SYMBOL_AND_VOLUME_COSTS_NOT_NEW_ORDER_MULTIPLIER");
+Check(Sum()==0m,"NO_EXISTING_TICKET_ZERO_AGGREGATE");
+Check(!Sum(.37m,null).HasValue,"UNKNOWN_EXISTING_POSITION_COST_HOLDS");
+Check(!Sum(.37m,-.01m).HasValue,"NEGATIVE_EXISTING_POSITION_COST_HOLDS");
+Check(!Sum(decimal.MaxValue,.01m).HasValue,"EXISTING_POSITION_COST_OVERFLOW_HOLDS");
+Check(!Sum(decimal.MaxValue,.0000000000000000000000000001m).HasValue,
+ "EXISTING_COST_DECIMAL_PRECISION_LOSS_HOLDS");
 Check(MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,79m,.49m,120m),
  "CASH_RESERVED_FOR_FULL_ROUNDTRIP_COST_AND_MARGIN");
 Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,80m,.49m,120m),

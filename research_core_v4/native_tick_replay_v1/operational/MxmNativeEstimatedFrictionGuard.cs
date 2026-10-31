@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Mxm.Replay {
 /// <summary>
@@ -29,6 +30,23 @@ public static class MxmNativeEstimatedFrictionGuard {
     return false;
    return afterCost>=minimumFreeMarginReserveEur;
   }}catch(OverflowException){return false;}
+ }
+ /// <summary>Cost floors for ACTUAL existing MXM broker tickets, one per
+ /// symbol/volume. Never substitute proposed-ticket cost times position count.
+ /// Missing cost, negative cost or decimal precision loss blocks admission.
+ /// </summary>
+ public static decimal? SumExistingPositionCostFloors(IReadOnlyList<decimal?> costs) {
+  if(costs==null)return null;
+  decimal total=0m;
+  try {checked {
+   foreach(decimal? cost in costs) {
+    if(!cost.HasValue || cost.Value<0m)return null;
+    decimal updated=total+cost.Value;
+    if(cost.Value>0m && updated<=total)return null;
+    total=updated;
+   }
+   return total;
+  }}catch(OverflowException){return null;}
  }
  public static decimal? FloorEur(decimal configuredReserveEur,
   decimal buyCommissionEstimateEur,decimal sellCommissionEstimateEur,

@@ -538,6 +538,10 @@ public sealed partial class MxmReferenceProductBot : Robot {
   // BEFORE any risk computation; order book IDs alone cannot detect a changed stop.
   if(!TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting))
    return;
+  decimal? existingTicketCosts=ExistingPositionRoundTripCostFloors();
+  if(!existingTicketCosts.HasValue) {
+   Print("MXM_EXISTING_TICKET_NATIVE_COST_UNVERIFIED_SAFE_HOLD");return;
+  }
   if(!originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
    Print("MXM_RISK_BOOK_CHANGED_DURING_ESTIMATE_HOLD");return;
   }
@@ -545,7 +549,7 @@ public sealed partial class MxmReferenceProductBot : Robot {
    (decimal)initialEquity,(decimal)existingRisk,(decimal)newStopRisk,
    (decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
    observedCostReserve.Value,
-   observedCostReserve.Value*protectedExisting);
+   existingTicketCosts.Value);
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
   }
@@ -599,6 +603,13 @@ public sealed partial class MxmReferenceProductBot : Robot {
   }catch(Exception e) {
    Print("MXM_NATIVE_FEE_RECHECK_UNVERIFIED_HOLD_"+e.GetType().Name);return;
   }
+  decimal? finalExistingTicketCosts=ExistingPositionRoundTripCostFloors();
+  if(!finalExistingTicketCosts.HasValue || finalExistingTicketCosts.Value>existingTicketCosts.Value) {
+   Print("MXM_EXISTING_TICKET_NATIVE_COST_INCREASED_OR_UNVERIFIED_HOLD");return;
+  }
+  // Preserve the earliest observed cost-FX lease across all position costs.
+  finalCostFxExpires=costFxEstimateValidUntilMs;
+  finalCostFxCheckedAt=ObservationClockMs();
   if(!originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
    Print("MXM_RISK_BOOK_CHANGED_BEFORE_SUBMISSION_HOLD");return;
   }
@@ -737,6 +748,30 @@ public sealed partial class MxmReferenceProductBot : Robot {
     }
   return true;
  }
+ // A protected existing MXM position may have a DIFFERENT symbol, volume,
+ // spread and native broker fee from the proposed ticket. Sum individual
+ // currently observable cost floors; UNKNOWN is NEVER assumed to be zero.
+ decimal? ExistingPositionRoundTripCostFloors() {
+  var costs=new List<decimal?>();
+  long? earliestExpiry=costFxEstimateValidUntilMs;
+  try {
+   foreach(var existing in Positions.FindAll(Label)) {
+    var symbol=existing.Symbol;
+    double bid=symbol.Bid,ask=symbol.Ask;
+    var fee=CurrentNativeCommission(symbol,existing.VolumeInUnits,bid,ask);
+    var reserve=NativeObservedRoundTripRiskReserve(
+     symbol,existing.VolumeInUnits,fee,bid,ask);
+    if(!reserve.HasValue)return null;
+    costs.Add(reserve.Value);
+    if(costFxEstimateValidUntilMs.HasValue)
+     earliestExpiry=earliestExpiry.HasValue
+      ?Math.Min(earliestExpiry.Value,costFxEstimateValidUntilMs.Value)
+      :costFxEstimateValidUntilMs.Value;
+   }
+   return MxmNativeEstimatedFrictionGuard.SumExistingPositionCostFloors(costs);
+  }catch(Exception){return null;}
+  finally {costFxEstimateValidUntilMs=earliestExpiry;}
+ }
  double SelectAffordableNativeUnits(Symbol symbol,TradeType direction,
   double requested,double stopPips) {
   if(!double.IsFinite(requested)||!double.IsFinite(stopPips)||stopPips<=0 ||
@@ -766,6 +801,10 @@ public sealed partial class MxmReferenceProductBot : Robot {
    }
    var riskBookBefore=CaptureNativeRiskBook();
    var sizingObservationLease=CaptureRiskObservationLease(symbol,symbol.Bid,symbol.Ask,riskBookBefore);
+   decimal? existingTicketCosts=ExistingPositionRoundTripCostFloors();
+   if(!existingTicketCosts.HasValue) {
+    Print("MXM_PRE_SIZING_EXISTING_TICKET_COST_UNVERIFIED_HOLD");return 0d;
+   }
    if(!TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting) ||
       !riskBookBefore.SequenceEqual(CaptureNativeRiskBook())) {
     Print("MXM_PRE_SIZING_EXISTING_RISK_UNVERIFIED_HOLD");return 0d;
@@ -794,7 +833,7 @@ public sealed partial class MxmReferenceProductBot : Robot {
        (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
        owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
      if(MxmStopRiskAdmission.Check(equity,(decimal)existingRisk,(decimal)risk,riskPercent,
-       costReserve.Value,costReserve.Value*protectedExisting)!=MxmStopRiskAdmission.Admit)return false;
+       costReserve.Value,existingTicketCosts.Value)!=MxmStopRiskAdmission.Admit)return false;
      return MxmOwnerEntryEnvelope.Check(free,(decimal)margin,
        fee.PerSideCeilingEur,(decimal)risk,costReserve.Value)==MxmOwnerEntryEnvelope.Admit;
     }catch(Exception){return false;}
