@@ -1,0 +1,73 @@
+name: MXM B-E original W37 native quote-lock release predictive EUR200 trial
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/be_locked_book_release_first_20261031.py
+      - .github/workflows/mxm-be-lock-release-first-20261031.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-lock-release-first-20261031.yml
+permissions: {contents: read}
+concurrency:
+  group: mxm-be-lock-release-one-frozen-original-20261031
+  cancel-in-progress: false
+jobs:
+  source-blind-causal-portfolio-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Test frozen forecast, official raw 1e5 scale, no locked fills, causal price leases and bidask EUR economics
+        run: |
+          set -eu
+          python3 -m py_compile research_core_v4/laboratory/be_locked_book_release_first_20261031.py
+          python3 -m research_core_v4.laboratory.be_locked_book_release_first_20261031 selftest
+  exact-original-r3-dependent-economic-trial:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    needs: source-blind-causal-portfolio-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    environment: mxm-r3-custody-v1
+    permissions: {contents: read, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
+      - name: Restore existing native ciphertext originals with pinned dependencies, no broker access
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          mkdir -p "${RUNNER_TEMP}/mxm-locked"
+          python3 -m research_core_v4.laboratory.durable_week_chronology --out "${RUNNER_TEMP}/mxm-locked/eur-original"
+          python3 -m research_core_v4.laboratory.durable_gbpusd_week37_chronology --out "${RUNNER_TEMP}/mxm-locked/gbp-original"
+          cp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/usd_pair_native_reception.py research_core_v4/laboratory/usd_pair_alignment.py .sealed-chronology-source/research_core_v4/laboratory/
+      - name: Decode genuine W37 original BIDASK only with existing restricted R3 key
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          cd .sealed-chronology-source
+          python3 -m research_core_v4.laboratory.usd_pair_native_reception export EURUSD "${RUNNER_TEMP}/mxm-locked/eur-original/capture.mxmenc" "${RUNNER_TEMP}/mxm-locked/eur.ndjson"
+          python3 -m research_core_v4.laboratory.usd_pair_native_reception export GBPUSD "${RUNNER_TEMP}/mxm-locked/gbp-original/capture.mxmenc" "${RUNNER_TEMP}/mxm-locked/gbp.ndjson"
+      - name: Execute ONE preregistered quote-lock release causal economic account, seal private episodes R3
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.be_locked_book_release_first_20261031 original --eur "${RUNNER_TEMP}/mxm-locked/eur.ndjson" --gbp "${RUNNER_TEMP}/mxm-locked/gbp.ndjson" --out verification/be-lock-release-w37/aggregate.json --private verification/be-lock-release-w37/private-episodes.mxmenc
+      - name: Upload bounded public scenario verdict and existing-R3 encrypted individual evidence only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-native-lock-release-first-original-${{ github.run_id }}
+          path: |
+            verification/be-lock-release-w37/aggregate.json
+            verification/be-lock-release-w37/private-episodes.mxmenc
+          if-no-files-found: error
+          retention-days: 90
