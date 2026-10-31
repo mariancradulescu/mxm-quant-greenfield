@@ -15,9 +15,19 @@ public static class MxmNativeEstimatedFrictionGuard {
   if(configuredReserveEur<0m || buyCommissionEstimateEur<0m ||
      sellCommissionEstimateEur<0m || currentSpreadRiskEstimateEur<0m ||
      extraSlippageAllowanceEur<0m)return null;
+  // decimal is 96-bit decimal *precision*, not unbounded exact rationals.
+  // At very large values a positive cent can round away without OverflowException.
+  // That would silently omit spread/slippage from an advertised EUR stop budget.
+  static decimal AddPositiveExactOrThrow(decimal left,decimal increment) {
+   decimal sum=checked(left+increment);
+   if(increment>0m && sum<=left)throw new OverflowException(
+    "EUR_POSITIVE_CASH_COMPONENT_LOST_TO_DECIMAL_PRECISION");
+   return sum;
+  }
   try {checked {
    decimal twoSidedFees=2m*Math.Max(buyCommissionEstimateEur,sellCommissionEstimateEur);
-   decimal observedCostFloor=twoSidedFees+currentSpreadRiskEstimateEur+extraSlippageAllowanceEur;
+   decimal withSpread=AddPositiveExactOrThrow(twoSidedFees,currentSpreadRiskEstimateEur);
+   decimal observedCostFloor=AddPositiveExactOrThrow(withSpread,extraSlippageAllowanceEur);
    return Math.Max(configuredReserveEur,observedCostFloor);
   }}catch(OverflowException){return null;}
  }
