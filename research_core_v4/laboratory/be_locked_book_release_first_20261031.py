@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from decimal import Decimal as D
 from datetime import datetime,timezone
-import argparse,hashlib,heapq,itertools,json
+import argparse,hashlib,heapq,itertools,json,gzip
 from pathlib import Path
 from .w37_authentic_spread_cash_20261031 import source_stream,digest
 from .usd_pair_native_reception import SOURCES,START,END
@@ -90,7 +90,7 @@ def analyze(eur,gbp):
  gross=D(0);cost=D(0);net=D(0)
  risk_fault=None;pending=None;position=None
  hashes=hashlib.sha256();nrows=Counter();last=-1
- event_decisions=0;event_entries=0
+ event_decisions=0;event_entries=0;private_ledger=[]
  def week(t):return datetime.fromtimestamp(t/1000,timezone.utc).strftime("%G-W%V")
  def day(t):return datetime.fromtimestamp(t/1000,timezone.utc).strftime("%Y-%m-%d")
  def confirm_exit(t,b,fx,is_stop):
@@ -99,6 +99,12 @@ def analyze(eur,gbp):
   g,n,delta,st=result
   gross+=g;net+=n;cost-=delta;cash+=n;top=max(top,cash);maxdd=max(maxdd,top-cash)
   stats["settled"]+=1;stats["stops"]+=int(st)
+  stats["gross_positive"]+=int(g>0)
+  stats["scenario_net_positive"]+=int(n>0)
+  private_ledger.append({"decision_ms":position["decision"],"entry_ms":position["t"],"exit_ms":t,
+    "symbol":position["sym"],"direction":position["dir"],"entry_bid_ask_raw":position["entry"],
+    "exit_bid_ask_raw":b,"eurusd_fx_bid_ask_raw":fx,"gross_eur":str(g),
+    "scenario_net_eur":str(n),"scenario_cost_eur":str(-delta),"stop_observed":bool(st)})
   weekly[position["week"]]["settled"]+=1
   days[day(t)]["settled"]+=1
   hashes.update((f'{position["decision"]}|{position["t"]}|{t}|{position["sym"]}|{position["dir"]}|'+
@@ -145,8 +151,12 @@ def analyze(eur,gbp):
      q=price_covered(books,sym,t)
      if q:
       b,fx=q
+      if b[1]-b[0]>RULE["release_own_spread_max_raw"]:
+       stats["entry_quote_spread_rejected"]+=1;pending=None
+       continue
       scenario_margin=D(RULE["postdated_margin_eur"][sym])
-      stop_risk=D(RULE["stop_distance_raw"])*D(1000)/D(100000)*D(100000)/D(fx[0])
+      stop_risk=(D(RULE["stop_distance_raw"]+2*RULE["release_own_spread_max_raw"])*D(1000)/D(fx[0])+
+                 D('0.08')*D(100000)/D(fx[0]))
       # Owner one-account capital *today*. No prospective earnings added.
       if (scenario_margin>D(RULE["ticket_margin_cap_eur"]) or
           cash-scenario_margin<D(RULE["free_reserve_eur"]) or
@@ -198,7 +208,9 @@ def analyze(eur,gbp):
  if not risk_fault:
   need(all(nrows[s]==SOURCES[s]["bid"]+SOURCES[s]["ask"] for s in RULE["symbols"]),
        "ALL_SOURCE_EVENTS_CONSUMED")
- if position and not risk_fault:risk_fault="UNSETTLED_FINAL_SOURCE_POSITION"
+ if position and not risk_fault:
+  risk_fault="UNSETTLED_FINAL_SOURCE_POSITION"
+  stats["unresolved_positions"]+=1
  # An unfilled pending decision can expire with the original source; it is
  # not a broker order and is explicitly accounted for, never a phantom fill.
  if pending:stats["unfilled_pending"]+=1
@@ -206,7 +218,7 @@ def analyze(eur,gbp):
       "EACH_MODELED_EXPOSURE_RECONCILED")
  if risk_fault:stats["halted_incomplete_account"]+=1
  ready_weeks=sum(v["entries"]>=21 for v in weekly.values())
- return {
+ report={
   "schema":"mxm.be.lock-release-native-bidask-dependent-economic-v1",
   "hypothesis":RULE,"source_runs":{s:SOURCES[s]["run"] for s in RULE["symbols"]},
   "source_event_counts_before_fault":dict(nrows),
@@ -219,6 +231,7 @@ def analyze(eur,gbp):
   "hard21_model_weeks":ready_weeks,"hard21_broker_confirmed":False,
   "all_original_source_events_processed":risk_fault is None,
   "private_individual_episodes_digest":hashes.hexdigest(),
+  "individual_episode_count":len(private_ledger),
   "broker_orders":0,"cloud_activations":0,
   "historical_native_arrival_order_proven":False,
   "historical_fee_margin_slippage_qualified":False,
@@ -229,6 +242,7 @@ def analyze(eur,gbp):
    "NEGATIVE_CONDITIONAL_NET" if net<=0 else
    "DEPENDENT_DEVELOPMENT_UNCONFIRMED"
  }
+ return report,private_ledger
 def selftest():
  need(ready({"EURUSD":{"bid":(110000,123),"ask":(110003,123)}},"EURUSD",124)==(110000,110003),
       "OBSERVED_QUOTE")
@@ -249,11 +263,22 @@ def selftest():
 def main():
  p=argparse.ArgumentParser()
  p.add_argument("mode",choices=["selftest","original"])
- p.add_argument("--eur",type=Path);p.add_argument("--gbp",type=Path);p.add_argument("--out",type=Path)
+ p.add_argument("--eur",type=Path);p.add_argument("--gbp",type=Path);p.add_argument("--out",type=Path);p.add_argument("--private",type=Path)
  a=p.parse_args();selftest()
  if a.mode=="original":
-  need(a.eur and a.gbp and a.out,"PRIVATE_ORIGINAL_INPUTS")
-  out=analyze(a.eur,a.gbp)
+  need(a.eur and a.gbp and a.out and a.private,"PRIVATE_ORIGINAL_INPUTS")
+  out,individual=analyze(a.eur,a.gbp)
+  from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
+  from research_core_v4.laboratory.common import encoded
+  public=Path(__file__).resolve().parents[2]/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem'
+  need(public_spki_sha256(public)=='464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11',
+       'EXISTING_R3_PUBLIC_RECIPIENT')
+  a.private.parent.mkdir(parents=True,exist_ok=True)
+  need(not a.private.exists(),"NO_PRIVATE_RESULT_OVERWRITE")
+  confidential=encoded({"model":RULE["id"],"episodes":individual})
+  out["private_individual_plaintext_sha256"]=hashlib.sha256(confidential).hexdigest()
+  encrypt_shard(gzip.compress(confidential,mtime=0),public_key=public,output=a.private)
+  out["private_r3_ciphertext_sha256"]=digest(a.private)
   a.out.parent.mkdir(parents=True,exist_ok=True)
   need(not a.out.exists(),"NO_OVERWRITE")
   a.out.write_text(json.dumps(out,sort_keys=True,indent=2)+"\n")
