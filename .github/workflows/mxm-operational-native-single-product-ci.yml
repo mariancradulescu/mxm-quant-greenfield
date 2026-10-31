@@ -64,6 +64,7 @@ jobs:
           assert s.count('NativeObservedRoundTripRiskReserve(')>=3
           assert 'costReserve.Value*protectedExisting' in s
           assert s.count('observedCostReserve.Value')>=3
+          assert s.count('MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(')>=3
           assert 'finalCostReserve.Value>observedCostReserve.Value' in s
           assert 'MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers' in s
           assert 'ExecuteMarketOrder(direction,instrumentName,units,Label,stopPips,null,requestComment)' in s
