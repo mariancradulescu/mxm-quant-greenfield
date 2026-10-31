@@ -9,6 +9,27 @@ namespace Mxm.Replay {
 /// No unknown, negative or overflowing input is ever silently set to zero.
 /// </summary>
 public static class MxmNativeEstimatedFrictionGuard {
+ /// <summary>
+ /// EXTRA necessary margin check: reserve the conservative full modeled cash
+ /// entry cost *in addition to* the broker's estimated margin. The old broker
+ /// fee-only account check remains; this can only reject more new positions.
+ /// Not a guarantee of future marks, live slippage or liquidation margin.
+ /// </summary>
+ public static bool PostEntryReserveCovers(decimal freeMarginEur,
+  decimal ticketMarginEur,decimal modeledFullRoundTripCostEur,
+  decimal minimumFreeMarginReserveEur) {
+  if(freeMarginEur<=0m || ticketMarginEur<=0m ||
+     modeledFullRoundTripCostEur<0m || minimumFreeMarginReserveEur<0m)
+   return false;
+  try {checked {
+   decimal afterMargin=freeMarginEur-ticketMarginEur;
+   if(afterMargin>=freeMarginEur)return false;
+   decimal afterCost=afterMargin-modeledFullRoundTripCostEur;
+   if(modeledFullRoundTripCostEur>0m && afterCost>=afterMargin)
+    return false;
+   return afterCost>=minimumFreeMarginReserveEur;
+  }}catch(OverflowException){return false;}
+ }
  public static decimal? FloorEur(decimal configuredReserveEur,
   decimal buyCommissionEstimateEur,decimal sellCommissionEstimateEur,
   decimal currentSpreadRiskEstimateEur,decimal extraSlippageAllowanceEur) {
