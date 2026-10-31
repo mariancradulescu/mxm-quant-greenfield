@@ -544,7 +544,7 @@ public sealed partial class MxmReferenceProductBot : Robot {
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
   }
-  // Immutable OWNER absolute limits supplement configured percent/reserve.
+  // Current DIRECTOR-coded conservative absolute ceilings supplement configured percent/reserve.\n   // Their numbers are NOT immutable OWNER mandates; do not weaken them implicitly.
   // Native observed fees are estimates, not actual future fill charges;
   // EUR120 reserve and EUR2 proposed risk remain estimates, not guarantees.
   string ownerEnvelope=MxmOwnerEntryEnvelope.Check(
