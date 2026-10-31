@@ -63,6 +63,16 @@ public sealed partial class MxmReferenceProductBot {
    // time-stamped certified EUR settlement price.
    Print("MXM_NATIVE_MIN_TICKET_PIP_CASH_ESTIMATE symbol={0} volumeUnits={1} observedSpreadPips={2:F5} nativeCashPerPipEUR={3:F6} nativeObservedSpreadRiskEUR={4:F6} profitForecastEUR=UNKNOWN commissionEUR=UNKNOWN slippageEUR=UNKNOWN payoffVerified=false accountMutation=false",
       symbol.Name,min,spreadPips,cashPerPip,spreadCashEstimate);
+   // Economic readback for ALL observed asset classes, not an instrument
+   // eligibility decision and NOT a fee estimate. The coded EUR2 limit is
+   // a currently conservative DIRECTOR runtime cap, not immutable OWNER law.
+   if(!double.IsFinite(ExtraSlippageCushionEur) || ExtraSlippageCushionEur<0)
+    throw new ArgumentException("NATIVE_SLOP_CUSHION_UNVERIFIED");
+   decimal headroom=checked(MxmOwnerEntryEnvelope.MaxEstimatedNewEntryLossEur-
+     (decimal)stopRisk-(decimal)spreadCashEstimate-(decimal)ExtraSlippageCushionEur);
+   Print("MXM_NATIVE_MIN_TICKET_RISK_HEADROOM symbol={0} minUnits={1} codedLossCapEur={2} nativeStopRiskEur={3:F6} observedSpreadRiskEur={4:F6} additionalSlippageCushionEur={5:F6} maximumTwoSidedCommissionBudgetEur={6:F6} necessaryStopPlusSpreadRoom={7} actualCommissionEur=UNKNOWN expectedNetEur=UNKNOWN brokerFill=false",
+     symbol.Name,min,MxmOwnerEntryEnvelope.MaxEstimatedNewEntryLossEur,stopRisk,
+     spreadCashEstimate,ExtraSlippageCushionEur,headroom,headroom>0?"POSITIVE_NOT_SUFFICIENT":"NONPOSITIVE");
   } catch(Exception e) {
    // A read-only unavailable observation is never interpreted as low cost,
    // a missing position or permission to mutate an account.
