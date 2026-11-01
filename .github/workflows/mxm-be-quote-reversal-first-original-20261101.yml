@@ -39,8 +39,9 @@ jobs:
           workflow=Path('.github/workflows/mxm-be-quote-reversal-first-original-20261101.yml').read_text()
           tokens=[line.strip() for line in workflow.splitlines() if line.strip().startswith('GH_TOKEN:')]
           keys=[line.strip() for line in workflow.splitlines() if line.strip().startswith('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM:')]
-          assert tokens==['GH_TOKEN: ${{ github.token }}']*2
-          assert keys==['MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}']
+          interpolation_start='$'+'{{'
+          assert tokens==['GH_TOKEN: '+interpolation_start+' github.token }}']*2
+          assert keys==['MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: '+interpolation_start+' secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}']
           print("MXM_BE_AUTHENTIC_BIDASK_FIRST_ECONOMIC_HYPOTHESIS_FIXED")
           PY
   one-authentic-custody-bidask-economic-study:
