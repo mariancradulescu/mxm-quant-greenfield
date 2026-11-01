@@ -155,7 +155,7 @@ def original():
    "symbol_population_not_permanent_filter":SYMBOLS,
    "from_utc":WINDOW_START,"to_utc_exclusive":WINDOW_END,
    "research_development_until_utc":"2026-10-22T00:00:00Z",
-   "later_week_held_for_independent_future_test":True,
+   "later_week_temporally_reserved_not_access_fenced":True,
    "per_symbol_slice_counts":support,
    "broker_current_symbol_list_count":len(res.symbol),
    "bars_total":sum(len(x["bars"]) for x in allrows),
