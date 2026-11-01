@@ -56,7 +56,7 @@ Check(Capacity(200m,201m,31.02m,31.02m,1m,.1m,.1m,
   120m,.4m,.01m)=="UNVERIFIED_NO_ADMISSION","FREE_MARGIN_ABOVE_EQUITY_REJECT");
 Check(Capacity(200m,200m,31.02m,31.02m,1m,-.1m,.1m,
   120m,.4m,.01m)=="UNVERIFIED_NO_ADMISSION","NEGATIVE_VISIBLE_COST_UNVERIFIED");
-Check(Capacity(decimal.MaxValue,decimal.MaxValue,1m,1m,1m,.1m,.1m,
+Check(Capacity(200m,200m,1m,1m,decimal.MaxValue,.1m,.1m,
   120m,.4m,.01m)=="UNVERIFIED_NO_ADMISSION","FULL_PRECISION_OVERFLOW_UNVERIFIED");
 Check(Capacity(200m,200m,31.02m,31.02m,1m,.1m,.1m,
   120m,1.1m,.01m)=="UNVERIFIED_NO_ADMISSION","INVALID_LIMIT_NOT_PERMITTED");
