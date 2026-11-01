@@ -104,7 +104,7 @@ def selftest():
  require_complete_bars(baseline,5000,99,17)
  for wire_flag in (0,1):
   candidate=m.ProtoOAGetTrendbarsRes()
-  candidate.ParseFromString(baseline.SerializeToString()+b"\\x38"+bytes([wire_flag]))
+  candidate.ParseFromString(baseline.SerializeToString()+bytes([0x38,wire_flag]))
   try:require_complete_bars(candidate,5000,99,17)
   except ValueError:need(wire_flag==1,"FALSE_HAS_MORE_WIRE_REJECTED")
   else:need(wire_flag==0,"TRUE_HAS_MORE_WIRE_ACCEPTED")
