@@ -36,9 +36,10 @@ jobs:
           assert 'require_read_only_request' in p
           assert 'not side["BID"]["has_more"] and not side["ASK"]["has_more"]' in p
           workflow=Path('.github/workflows/mxm-be-pepperstone-signed-delta-guarded-20261101.yml').read_text()
-          expected='actions/workflows/mxm-be-pepperstone-signed-delta-guarded-20261101.yml/runs?per_page=100'
-          assert expected in workflow
-          assert 'actions/workflows/mxm-be-new-pepperstone-bidask-20261101.yml/runs?per_page=100' not in workflow
+          guard_lines=[line.strip() for line in workflow.splitlines()
+            if line.strip().startswith("z=read('actions/workflows/")]
+          assert guard_lines==[
+            "z=read('actions/workflows/mxm-be-pepperstone-signed-delta-guarded-20261101.yml/runs?per_page=100')"]
           assert "len(pushes)==1 and pushes[0]['id']==int(os.environ['GITHUB_RUN_ID'])" in workflow
           assert 'from m6.ctrader_transport import StdlibCTraderTransport' in p
           print('MXM_BE_READ_ONLY_BIDASK_SCOPE_AND_SCIENCE_SUCCESS')
