@@ -45,8 +45,9 @@ def decode_side(ticks,start,end):
   rawtime=int(tick.timestamp)
   stamp=rawtime if i==0 else stamp-rawtime
   price=int(tick.tick)
-  need(rawtime>=0 and (i==0 or rawtime>0) and price>0
-       and start<=stamp<=end and (not out or stamp<out[-1][0]),
+  # Multiple genuine ticks may share the same millisecond (zero delta).
+  need(rawtime>=0 and price>0
+       and start<=stamp<=end and (not out or stamp<=out[-1][0]),
        "TICK_DELTA_CHRONOLOGY_OR_PRICE")
   out.append((stamp,price))
  return list(reversed(out))
