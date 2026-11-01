@@ -8,7 +8,8 @@ import hashlib
 import json
 import os
 import time
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_EVEN
+from google.protobuf.unknown_fields import UnknownFieldSet
 from pathlib import Path
 from m6.ctrader_capture import require_read_only_request
 from m6.ctrader_proto import OpenApiMessages_pb2 as m
@@ -35,9 +36,39 @@ def need(x,why):
  if not x:raise ValueError("MXM_BE_NEW_OCT_M5_"+why)
 def ms(s):return int(dt.datetime.fromisoformat(s.replace("Z","+00:00")).timestamp()*1000)
 def digest(x):return hashlib.sha256(x).hexdigest()
+def require_complete_bars(ans,requested_count,expected_account,expected_symbol):
+ # Spotware protobuf defines optional hasMore as field 7, but the repository's
+ # older generated Python descriptor omits it. Protobuf retains the wire
+ # value as an unknown field: do not silently accept hasMore=TRUE.
+ need(isinstance(ans,m.ProtoOAGetTrendbarsRes),"NATIVE_TREND_BARS_RESPONSE")
+ # Vendored schema incorrectly requires deprecated timestamp, while Spotware
+ # currently marks that field optional and says not to use it. Check only
+ # actual required account and period fields, never the stale timestamp.
+ need(ans.HasField("ctidTraderAccountId") and ans.HasField("period"),
+      "NATIVE_REQUIRED_ACCOUNT_AND_PERIOD")
+ need(int(ans.ctidTraderAccountId)==int(expected_account) and
+      int(ans.period)==ProtoOATrendbarPeriod.Value("M5") and
+      (not ans.HasField("symbolId") or int(ans.symbolId)==int(expected_symbol)),
+      "NATIVE_TREND_BARS_IDENTITY")
+ need(0<requested_count and len(ans.trendbar)<requested_count,
+      "M5_RESPONSE_AT_COUNT_LIMIT")
+ if "hasMore" in ans.DESCRIPTOR.fields_by_name:
+  has_more=bool(ans.hasMore)
+ else:
+  extra=[f for f in UnknownFieldSet(ans) if f.field_number==7]
+  need(len(extra)<=1 and all(f.wire_type==0 and f.data in (0,1) for f in extra),
+       "M5_PAGINATION_WIRE_AMBIGUOUS")
+  # Proto2 optional bool defaults to FALSE when the field is absent.
+  has_more=bool(extra and extra[0].data==1)
+ need(not has_more,"NO_TRUNCATED_M5_SOURCE")
+ return True
+
 def decode_bars(raw,digits,start,end):
  need(1<=digits<=8 and start<end and (end-start)%M5==0,"BAR_CONTRACT")
- rows={};factor=Decimal(10)**digits
+ rows={};quantum=Decimal(1).scaleb(-digits)
+ def price(raw_value):
+  return str((Decimal(raw_value)/Decimal(100000)).quantize(
+      quantum,rounding=ROUND_HALF_EVEN))
  for x in raw:
   t=int(x.utcTimestampInMinutes)*60000
   if t<start or t>=end:continue
@@ -45,9 +76,9 @@ def decode_bars(raw,digits,start,end):
   cl=lo+int(x.deltaClose);v=int(x.volume)
   need(t%M5==0 and 0<lo<=min(o,cl)<=max(o,cl)<=hi and v>=0,
        "NATIVE_M5_OHLCV_GEOMETRY")
-  row={"open_utc_ms":t,"open":str(Decimal(o)/factor),
-       "high":str(Decimal(hi)/factor),"low":str(Decimal(lo)/factor),
-       "close":str(Decimal(cl)/factor),"tick_volume":v,
+  row={"open_utc_ms":t,"open":price(o),
+       "high":price(hi),"low":price(lo),
+       "close":price(cl),"tick_volume":v,
        "available_no_earlier_than_utc_ms":t+M5}
   need(t not in rows or rows[t]==row,"CONFLICTING_DUPLICATE_BAR")
   rows[t]=row
@@ -64,11 +95,23 @@ def selftest():
  class Bar:
   utcTimestampInMinutes=start//60000;low=100000;deltaOpen=15
   deltaHigh=30;deltaClose=20;volume=12
- row=decode_bars([Bar()],5,start,start+M5)
- need(len(row)==1 and row[0]["open"]=="1.00015" and
-      row[0]["close"]=="1.0002" and
-      row[0]["available_no_earlier_than_utc_ms"]==start+M5,
-      "OPEN_TIME_FENCE_AND_PRICE_DELTAS")
+ for digits,expected_open,expected_close in (
+     (5,"1.00015","1.00020"),(3,"1.000","1.000"),(2,"1.00","1.00"),
+     (7,"1.0001500","1.0002000")):
+  row=decode_bars([Bar()],digits,start,start+M5)
+  need(len(row)==1 and row[0]["open"]==expected_open and
+       row[0]["close"]==expected_close and
+       row[0]["available_no_earlier_than_utc_ms"]==start+M5,
+       "OPEN_TIME_FENCE_AND_BROKER_DIGITS")
+ baseline=m.ProtoOAGetTrendbarsRes(ctidTraderAccountId=99,
+      period=ProtoOATrendbarPeriod.Value("M5"),symbolId=17,timestamp=1234)
+ require_complete_bars(baseline,5000,99,17)
+ for wire_flag in (0,1):
+  candidate=m.ProtoOAGetTrendbarsRes()
+  candidate.ParseFromString(baseline.SerializeToString()+bytes([0x38,wire_flag]))
+  try:require_complete_bars(candidate,5000,99,17)
+  except ValueError:need(wire_flag==1,"FALSE_HAS_MORE_WIRE_REJECTED")
+  else:need(wire_flag==0,"TRUE_HAS_MORE_WIRE_ACCEPTED")
  class Bad(Bar):deltaClose=31
  try:decode_bars([Bad()],5,start,start+M5)
  except ValueError:pass
@@ -92,7 +135,7 @@ def original():
       os.environ.get("GITHUB_REF")=="refs/heads/"+BRANCH and
       os.environ.get("GITHUB_EVENT_NAME")=="push" and
       os.environ.get("GITHUB_RUN_ATTEMPT")=="1" and
-      os.environ.get("GITHUB_JOB")=="one-pepperstone-view-m5-source",
+      os.environ.get("GITHUB_JOB") in ("one-pepperstone-view-m5-source","one-pepperstone-view-m5-recovery"),
       "FIRST_OFFICIAL_GITHUB_ONLY")
  need(all(os.environ.get(k) for k in SECRETS) and
       not os.environ.get("R3_CUSTODY_PRIVATE_KEY_PEM"),
@@ -132,8 +175,7 @@ def original():
      symbolId=matches[name],period=ProtoOATrendbarPeriod.Value("M5"),
      fromTimestamp=a,toTimestamp=z,count=5000)
     ans=wire.request(req,timeout=30)
-    need(isinstance(ans,m.ProtoOAGetTrendbarsRes) and not bool(ans.hasMore),
-         "NO_TRUNCATED_M5_SOURCE")
+    require_complete_bars(ans,5000,account,matches[name])
     rows=decode_bars(ans.trendbar,precision[matches[name]],a,z)
     for row in rows:
      ts=row["open_utc_ms"]
