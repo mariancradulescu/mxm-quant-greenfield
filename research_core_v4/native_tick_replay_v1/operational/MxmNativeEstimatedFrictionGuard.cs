@@ -55,7 +55,7 @@ public static class MxmNativeEstimatedFrictionGuard {
    return unknown;
   try {checked {
    decimal cost=observedSpreadCostEur+slippageCushionEur;
-   if((observedSpreadCostEur>0m || slippageCushionEur>0m) &&
+   if(observedSpreadCostEur>0m && slippageCushionEur>0m &&
       cost<=Math.Max(observedSpreadCostEur,slippageCushionEur))
     return unknown;
    decimal stopPlusKnownCost=nativeStopRiskEur+cost;
