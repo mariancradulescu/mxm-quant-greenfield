@@ -79,6 +79,8 @@ def selftest():
  # BEFORE entering protected custody. This closes PR315's material defect.
  test={"settled":[[base,1,[str(D("100.123")),str(D("100.234"))]]]}
  json.loads(encoded(test))
+ flag(json.loads(b'{"original":"json-no-gzip"}')["original"]=="json-no-gzip",
+      "SELF_COLD_PLAINTEXT_IS_JSON")
  parts=sorted(original.CIPHER_DIR.glob("chunk-*.b64"))
  flag(len(parts)==7,"SELF_CIPHERTEXT_COUNT")
  cipher=b"".join(base64.b64decode(x.read_text(),validate=False) for x in parts)
@@ -215,14 +217,24 @@ def cold():
  with tempfile.TemporaryDirectory() as directory:
   tmp=pathlib.Path(directory);key,fp=_private_key_from_secret(tmp)
   flag(fp==FP,"COLD_RECIPIENT")
-  plain=unpack(owner.bounded_decrypt(raw,key,tmp))
+  plain=owner.bounded_decrypt(raw,key,tmp)
+  flag(plain.startswith(b'{') and plain.endswith(b'}'),"COLD_NATIVE_JSON_NOT_GZIP")
  flag(hashlib.sha256(plain).hexdigest()==r["private_sha256"],"COLD_SHA")
  d=json.loads(plain)
  if r.get("economic_outcomes"):
   for scenario in ("0.02","0.04","0.08"):
    flag(shared.reconcile(d["native_csharp_"+scenario])==
         r["scenario_results"][scenario],"COLD_EUR200_NATIVE_LEDGER")
- print("MXM_JPY_RESIDUAL_ANNUAL_COLD_NATIVE_FUNDED_PASS",r["run_id"])
+ proof={"schema":"mxm.be.jpy-fourhour.original-native-csharp-cold-readback.v1",
+  "original_run_id":r["run_id"],"original_head":r["head"],
+  "private_cipher_sha256":r["private_cipher_sha256"],
+  "original_ledger_scenarios_verified":sorted(r.get("scenario_results",{})),
+  "original_full_ledger_recomputed_without_economic_policy":True,
+  "model_rerun":False,"source_market_opened":False,"orders":0,"cloud":False,
+  "original_classification":r["classification"]}
+ (OUT/"cold.json").write_bytes(encoded(proof))
+ print("MXM_JPY_RESIDUAL_ANNUAL_COLD_NATIVE_FUNDED_PASS",r["run_id"],
+       json.dumps(proof,sort_keys=True),flush=True)
 
 if __name__=="__main__":
  import sys
