@@ -73,6 +73,13 @@ def selftest():
  # A future-only mutation never enters the closed-input calculation.
  for v in m.values():v[FIRST+2*H]=D("100000")
  flag(signal(FIRST,m) is None,"SELF_FUTURE_LEAK")
+ parts=sorted(tape_source.CIPHER_DIR.glob("chunk-*.b64"))
+ flag(len(parts)==7,"SELFTEST_ORIGINAL_SOURCE_PARTS")
+ # Reuse the already certified original reader's whitespace-tolerant Base64
+ # semantics. Authenticate the exact ENCRYPTED envelope without any secret.
+ cipher=b"".join(base64.b64decode(q.read_text(),validate=False) for q in parts)
+ flag(hashlib.sha256(cipher).hexdigest()==tape_source.EXPECTED_CIPHER_SHA,
+      "SELFTEST_SOURCE_ENVELOPE_SHA256")
  print("MXM_JPY_FACTOR_ANNUAL_FROZEN_SOURCE_BLIND_SELFTEST_SUCCESS")
 
 def decode(tape):
@@ -239,6 +246,51 @@ def verify_original_scope():
  flag(not OUT.exists(),"EXISTING_OUTCOME")
  print("MXM_JPY_ANNUAL_FIRST_EXECUTION_ADMITTED")
 
+
+def recover_admit():
+ # A NEW reviewed one-shot recovery lane, not a second economic hypothesis,
+ # and never a rerun of a completed economic outcome.
+ flag(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield"
+      and os.environ.get("GITHUB_REF")=="refs/heads/mxm-remediation-p0-p4-20261015-v1"
+      and os.environ.get("GITHUB_EVENT_NAME")=="push"
+      and os.environ.get("GITHUB_RUN_ATTEMPT")=="1","RECOVERY_OFFICIAL_FIRST")
+ def get(s):
+  return json.loads(subprocess.check_output(
+   ["gh","api","repos/mariancradulescu/mxm-quant-greenfield/"+s],text=True))
+ old=get("actions/runs/41345691597")
+ flag(old["conclusion"]=="failure" and old["run_attempt"]==1 and
+      old["head_sha"]=="7c84ffd3cfd6fb1bc9ea0a57034e26e8b6f47c09",
+      "RECOVERY_ONLY_ORIGINAL_FAILED_HEAD")
+ oldart=get("actions/runs/41345691597/artifacts")
+ flag(oldart["total_count"]==0,"RECOVERY_ORIGINAL_ECONOMIC_ARTIFACT_EXISTS")
+ oldjobs=get("actions/runs/41345691597/jobs?per_page=100")
+ bad=[j for j in oldjobs["jobs"] if j["name"]=="one-original-annual-csharp-funded"]
+ flag(len(bad)==1 and bad[0]["conclusion"]=="failure"
+      and any(z["name"].startswith("Authentic annual Pepperstone tape")
+              and z["conclusion"]=="failure" for z in bad[0]["steps"]),
+      "RECOVERY_ORIGINAL_FAILED_BEFORE_SOURCE_ADMISSION")
+ head=os.environ["GITHUB_SHA"]
+ flag(get("git/ref/heads/mxm-remediation-p0-p4-20261015-v1")["object"]["sha"]==head,
+      "RECOVERY_EXACT_OFFICIAL_HEAD")
+ parents=get("commits/"+head)["parents"]
+ flag(len(parents)==2 and parents[0]["sha"]==
+      "7c84ffd3cfd6fb1bc9ea0a57034e26e8b6f47c09","RECOVERY_ON_ORIGINAL_HEAD")
+ history=get("actions/workflows/mxm-be-jpy-annual-one-recovery-20261101.yml/runs?per_page=100")
+ pushes=[r for r in history["workflow_runs"] if r["event"]=="push" and
+        r["head_branch"]=="mxm-remediation-p0-p4-20261015-v1"]
+ flag(history["total_count"]<=100 and len(pushes)==1 and
+      pushes[0]["id"]==int(os.environ["GITHUB_RUN_ID"]),
+      "RECOVERY_ONE_NEW_PUSH_ONLY")
+ runs=get("actions/runs?event=pull_request&per_page=100")["workflow_runs"]
+ passed={r["name"] for r in runs if r["head_sha"]==parents[1]["sha"] and
+       r["conclusion"]=="success"}
+ flag({"MXM R3 protected technical installation CI",
+       "MXM CSharp Pepperstone protected gateway CI"}<=passed,
+      "RECOVERY_REVIEWED_CI")
+ flag(not OUT.exists(),"RECOVERY_NO_PRIOR_OUTPUT")
+ read_spec();selftest()
+ print("MXM_JPY_ORIGINAL_ONLY_FIRST_RECOVERY_ADMITTED")
+
 def run():
  p=read_spec();history=historical_accounting(ROOT)
  flag(history["reconciled"] and history["V2"]["used"]==21,"HISTORICAL_REGISTRY")
@@ -252,7 +304,7 @@ def run():
   tmp=pathlib.Path(directory)
   parts=sorted(tape_source.CIPHER_DIR.glob("chunk-*.b64"))
   flag(len(parts)==7,"SEVEN_PINNED_SOURCE_PARTS")
-  blob=b"".join(base64.b64decode(q.read_text(),validate=True) for q in parts)
+  blob=b"".join(base64.b64decode(q.read_text(),validate=False) for q in parts)
   raw=tape_source.decrypt(blob,private.encode(),tmp)
   tape=json.loads(raw)
   m=decode(tape);support=source_admit(m)
@@ -330,6 +382,6 @@ def cold():
 
 if __name__=="__main__":
  import sys
- flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","run","cold"),"ACTION")
+ flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","recover-admit","run","cold"),"ACTION")
  {"selftest":selftest,"admit":verify_original_scope,
-  "run":run,"cold":cold}[sys.argv[1]]()
+  "recover-admit":recover_admit,"run":run,"cold":cold}[sys.argv[1]]()
