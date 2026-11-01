@@ -210,6 +210,52 @@ def first_only():
  selftest();spec()
  print("MXM_TRIANGLE_ORIGINAL_ONE_NATIVE_ECONOMIC_TRIAL_ADMITTED")
 
+
+def recover_admit():
+ # NEW first-only reviewed recovery only for original #41350541329
+ # where immutable archival hash was truncated BEFORE the prior-ledger
+ # cold read, new source, registration, signals or CSharp evaluation.
+ flag(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield"
+      and os.environ.get("GITHUB_REF")=="refs/heads/mxm-remediation-p0-p4-20261015-v1"
+      and os.environ.get("GITHUB_EVENT_NAME")=="push"
+      and os.environ.get("GITHUB_RUN_ATTEMPT")=="1","RECOVERY_ONE_OFFICIAL")
+ def api(path):
+  return json.loads(subprocess.check_output(["gh","api",
+       "repos/mariancradulescu/mxm-quant-greenfield/"+path],text=True))
+ original_run=api("actions/runs/41350541329")
+ flag(original_run["conclusion"]=="failure" and
+      original_run["head_sha"]=="079ad99a9e28b1eda0b3cacbc619d9eb26ea6e8d"
+      and original_run["run_attempt"]==1,"RECOVERY_OLD_FAILURE_IDENTITY")
+ oldart=api("actions/runs/41350541329/artifacts")
+ flag(oldart["total_count"]==0,"RECOVERY_OLD_ECONOMIC_ARTIFACT_EXISTS")
+ jobs=api("actions/runs/41350541329/jobs?per_page=100")
+ j=[x for x in jobs["jobs"] if x["name"]=="actual-first-source-only"]
+ flag(len(j)==1 and j[0]["conclusion"]=="failure","RECOVERY_OLD_JOB")
+ stages={x["name"]:x["conclusion"] for x in j[0]["steps"]}
+ flag(stages["Read ONLY saved closed PR316 EUR200 original ledger for cost and risk loss attribution"]=="failure"
+       and stages["Execute ONE independently frozen FX parity family on the actual source and native CSharp EUR200 account"]=="skipped",
+       "RECOVERY_NO_PRIOR_TRIANGLE_ECONOMIC")
+ head=os.environ["GITHUB_SHA"]
+ flag(api("git/ref/heads/mxm-remediation-p0-p4-20261015-v1")["object"]["sha"]==head,
+      "RECOVERY_HEAD")
+ parents=api("commits/"+head)["parents"]
+ flag(len(parents)==2 and parents[0]["sha"]==
+      "079ad99a9e28b1eda0b3cacbc619d9eb26ea6e8d","RECOVERY_OFFICIAL_MERGE")
+ runs=api("actions/workflows/mxm-be-triangle-parity-one-recovery-20261101.yml/runs?per_page=100")
+ pushes=[r for r in runs["workflow_runs"] if r["event"]=="push" and
+         r["head_branch"]=="mxm-remediation-p0-p4-20261015-v1"]
+ flag(runs["total_count"]<=100 and len(pushes)==1 and
+       pushes[0]["id"]==int(os.environ["GITHUB_RUN_ID"]),"RECOVERY_NO_RELAUNCH")
+ ci=api("actions/runs?event=pull_request&per_page=100")["workflow_runs"]
+ passed={r["name"] for r in ci if r["head_sha"]==parents[1]["sha"] and
+         r["conclusion"]=="success"}
+ flag({"MXM R3 protected technical installation CI",
+       "MXM CSharp Pepperstone protected gateway CI"}<=passed,
+       "RECOVERY_PROTECTED_CI")
+ flag(not OUT.exists(),"RECOVERY_NO_OUTCOME")
+ selftest();spec()
+ print("MXM_TRIANGLE_IDENTICAL_STUDY_FIRST_SOURCE_RECOVERY_AUTHORIZED",flush=True)
+
 def run():
  p=spec()
  history=historical_accounting(ROOT)
@@ -315,7 +361,7 @@ def cold():
 
 if __name__=="__main__":
  import sys
- flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","forensics","run","cold"),
+ flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","recover-admit","forensics","run","cold"),
      "ENTRY_USAGE")
  {"selftest":selftest,"admit":first_only,
-  "forensics":public_loss_attribution,"run":run,"cold":cold}[sys.argv[1]]()
+  "recover-admit":recover_admit,"forensics":public_loss_attribution,"run":run,"cold":cold}[sys.argv[1]]()
