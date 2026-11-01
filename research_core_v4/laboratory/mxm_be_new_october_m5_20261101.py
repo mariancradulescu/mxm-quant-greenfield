@@ -57,6 +57,7 @@ def selftest():
       ms(WINDOW_END)-ms(WINDOW_START)==28*86400000 and
       len(ALLOWED)==6 and MAX_REQUESTS==21,"FROZEN_SCOPE")
  for n in ALLOWED:require_read_only_request(n)
+ need(ProtoOATrendbarPeriod.Value("M5")>=0,"M5_PROTO_ENUM_AVAILABLE")
  need("ProtoOANewOrderReq" not in ALLOWED and
       "ProtoOASubscribeSpotsReq" not in ALLOWED,"NO_TRADING_OR_SUBSCRIPTIONS")
  start=ms(WINDOW_START)
