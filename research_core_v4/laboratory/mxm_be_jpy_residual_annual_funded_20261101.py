@@ -79,6 +79,8 @@ def selftest():
  # BEFORE entering protected custody. This closes PR315's material defect.
  test={"settled":[[base,1,[str(D("100.123")),str(D("100.234"))]]]}
  json.loads(encoded(test))
+ flag(json.loads(b'{"original":"json-no-gzip"}')["original"]=="json-no-gzip",
+      "SELF_COLD_PLAINTEXT_IS_JSON")
  parts=sorted(original.CIPHER_DIR.glob("chunk-*.b64"))
  flag(len(parts)==7,"SELF_CIPHERTEXT_COUNT")
  cipher=b"".join(base64.b64decode(x.read_text(),validate=False) for x in parts)
@@ -215,7 +217,8 @@ def cold():
  with tempfile.TemporaryDirectory() as directory:
   tmp=pathlib.Path(directory);key,fp=_private_key_from_secret(tmp)
   flag(fp==FP,"COLD_RECIPIENT")
-  plain=unpack(owner.bounded_decrypt(raw,key,tmp))
+  plain=owner.bounded_decrypt(raw,key,tmp)
+  flag(plain.startswith(b'{') and plain.endswith(b'}'),"COLD_NATIVE_JSON_NOT_GZIP")
  flag(hashlib.sha256(plain).hexdigest()==r["private_sha256"],"COLD_SHA")
  d=json.loads(plain)
  if r.get("economic_outcomes"):
