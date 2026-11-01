@@ -6,12 +6,18 @@ namespace cAlgo.Robots {
 // Adds read-only economic facts to the ONE evolving product, not the
 // frozen backtest bot. Never estimates a EUR expectancy or sends an order.
 public sealed partial class MxmReferenceProductBot {
- void ReportNativeMinimumTicketAperture() {
-  if (!nativeRun.IsObserving) return;
+ void ReportNativeMinimumTicketAperture() =>
+  ReportNativeMinimumTicketAperture(nativeReceptionSymbol,nativeReceptionBook);
+ // Reuse the SAME actual native broker-account EUR cost/capacity evaluator
+ // for the selected causal portfolio symbol, never just the chart symbol.
+ // Return is a necessary-only receipt, NOT an executable signal or order gate.
+ string ReportNativeMinimumTicketAperture(Symbol? selectedSymbol,
+  MxmBookObservation<double>? selectedBook) {
+  if (!nativeRun.IsObserving) return "READ_ONLY_MODE_UNAVAILABLE";
   try {
-   if (nativeReceptionSymbol==null || nativeReceptionBook==null)
+   if (selectedSymbol==null || selectedBook==null)
     throw new ArgumentException("NATIVE_ECONOMIC_SOURCE_MISSING");
-   var book=nativeReceptionBook.ReadBook(Environment.TickCount64);
+   var book=selectedBook.ReadBook(Environment.TickCount64);
    var view=book.Observation;
    if (!view.SessionOpen || view.Faulted || view.Events==0 ||
        view.Origin!=MxmObservationOrigin.NativeCallbackSnapshot ||
@@ -21,7 +27,7 @@ public sealed partial class MxmReferenceProductBot {
        view.BidAgeMs.Value>5000 || view.AskAgeMs.Value>5000 ||
        view.BidAgeMs.Value<0 || view.AskAgeMs.Value<0)
     throw new ArgumentException("NATIVE_ECONOMIC_QUOTE_STALE_OR_UNOBSERVED");
-   var symbol=nativeReceptionSymbol;
+   var symbol=selectedSymbol;
    double bid=book.Bid.Value,ask=book.Ask.Value;
    if(!double.IsFinite(bid)||!double.IsFinite(ask)||bid<=0||ask<bid||
       bid!=symbol.Bid||ask!=symbol.Ask)
@@ -99,11 +105,13 @@ public sealed partial class MxmReferenceProductBot {
      symbol.Name,necessary,min,spreadCashEstimate,ExtraSlippageCushionEur,
      buyMargin,sellMargin,stopRisk,Account.Equity,Account.FreeMargin,
      MaxEstimatedMxmStopRiskPercent,MaxMarginFraction,MinimumFreeMarginReserveEur);
+   return necessary;
   } catch(Exception e) {
    // A read-only unavailable observation is never interpreted as low cost,
    // a missing position or permission to mutate an account.
    Print("MXM_NATIVE_MIN_TICKET_EUR_OBSERVATION_UNAVAILABLE reason={0} accountMutation=false",
      e.GetType().Name);
+   return "SOURCE_OR_COST_UNVERIFIED_NO_ADMISSION";
   }
  }
 }
