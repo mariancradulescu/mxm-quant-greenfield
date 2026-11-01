@@ -31,4 +31,36 @@ Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,0m,.49m,120m)
  "NO_ZERO_BROKER_MARGIN");
 Check(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(200m,79m,-.01m,120m),
  "NO_NEGATIVE_COST_GUESS");
+// Observational-only EUR200 model reference: actual Pepperstone broker ticket
+// margin/stop/spread values are supplied by native callback, never invented.
+string Capacity(decimal equity,decimal free,decimal buy,decimal sell,
+ decimal stop,decimal spread,decimal slip,decimal reserve,
+ decimal maxMargin,decimal maxRisk)
+ => MxmNativeEstimatedFrictionGuard.MinimumTicketNecessaryCapacity(
+   equity,free,buy,sell,stop,spread,slip,reserve,maxMargin,maxRisk);
+Check(Capacity(200m,200m,31.02m,31.02m,1m,.1m,.1m,120m,.4m,.01m)
+ =="PASSES_VISIBLE_NECESSARY_ONLY_NO_ADMISSION","EUR200_ONE_MIN_TICKET_NECESSARY_NOT_PERMISSION");
+Check(Capacity(150.9078m,150.9078m,31.02m,31.02m,1m,.1m,.1m,
+  120m,.4m,.01m)=="MIN_VOLUME_MARGIN_AND_CASH_RESERVE_NECESSARY_FAIL",
+  "PR316_150_EUR_CANNOT_USE_200_EUR_FREE_MARGIN_RESERVE_WHEN_CASH_SHORT");
+Check(Capacity(200m,200m,31.02m,31.02m,1.90m,.1m,.1m,
+  120m,.4m,.01m)=="STOP_PLUS_VISIBLE_COST_NECESSARY_FAIL",
+  "VISIBLE_SPREAD_SLIP_PUSHESTOPOVER2EUR");
+Check(Capacity(200m,200m,31.02m,80.01m,.5m,.1m,0m,
+  120m,.4m,.01m)=="MIN_VOLUME_MARGIN_AND_CASH_RESERVE_NECESSARY_FAIL",
+  "EITHER_DIRECTION_MUST_PASS_BROKER_MARGIN");
+Check(Capacity(200m,200m,31.02m,31.02m,.5m,0m,0m,
+  120m,.4m,.01m)=="PASSES_VISIBLE_NECESSARY_ONLY_NO_ADMISSION",
+  "ZERO_OBSERVED_SPREAD_NOT_AUTOMATIC_INVALID");
+Check(Capacity(200m,201m,31.02m,31.02m,1m,.1m,.1m,
+  120m,.4m,.01m)=="UNVERIFIED_NO_ADMISSION","FREE_MARGIN_ABOVE_EQUITY_REJECT");
+Check(Capacity(200m,200m,31.02m,31.02m,1m,-.1m,.1m,
+  120m,.4m,.01m)=="UNVERIFIED_NO_ADMISSION","NEGATIVE_VISIBLE_COST_UNVERIFIED");
+Check(Capacity(200m,200m,1m,1m,decimal.MaxValue,.1m,.1m,
+  120m,.4m,.01m)=="UNVERIFIED_NO_ADMISSION","FULL_PRECISION_OVERFLOW_UNVERIFIED");
+Check(Capacity(200m,200m,31.02m,31.02m,1m,.1m,.1m,
+  120m,1.1m,.01m)=="UNVERIFIED_NO_ADMISSION","INVALID_LIMIT_NOT_PERMITTED");
+Check(Capacity(200m,200m,31.02m,31.02m,1m,.1m,.1m,
+  120m,.4m,0m)=="UNVERIFIED_NO_ADMISSION","ZERO_STOP_FRACTION_UNVERIFIED");
+Console.WriteLine("MXM_READ_ONLY_NATIVE_EUR200_MINIMUM_TICKET_COMBINED_NECESSARY_CAPACITY_PASS_NO_ORDERS");
 Console.WriteLine("MXM_NATIVE_OBSERVED_SPREAD_PLUS_BOTH_FEES_EUR_STOP_RISK_GUARD_PASS_NO_ORDERS");

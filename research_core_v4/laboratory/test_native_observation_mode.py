@@ -22,6 +22,14 @@ class Compiled(unittest.TestCase):
    p=Path(tmp)/'in.json';o=Path(tmp)/'out.json';p.write_text(json.dumps(cases))
    subprocess.run(['dotnet','run','--project',str(PROJECT),'-c','Release','--no-build','--',str(p),str(o)],check=True,capture_output=True)
    return json.loads(o.read_bytes())
+ def test_real_csharp_minimum_ticket_capacity_fixture(self):
+  # Runs the EXISTING compiled C# fixture against EUR200/150.9078 margin,
+  # stop risk, spread, cash reserve and corrupted data, never a broker account.
+  p=ROOT/'research_core_v4/native_tick_replay_v1/operational/MxmNativeEstimatedFrictionGuardFixture.csproj'
+  result=subprocess.run(['dotnet','run','--project',str(p),'-c','Release'],
+                        check=True,capture_output=True,text=True,timeout=120)
+  self.assertIn('MXM_READ_ONLY_NATIVE_EUR200_MINIMUM_TICKET_COMBINED_NECESSARY_CAPACITY_PASS_NO_ORDERS',
+                result.stdout)
  def test_all_mode_environment_permission_combinations(self):
   cases=[dict(obs=o,demo=d,sim=s,env=e,actions=[]) for o,d,s in itertools.product((False,True),repeat=3) for e in ('Desktop','CLI','Cloud','UNKNOWN')]
   # explicit product above is three Boolean dimensions; env is separate
@@ -65,4 +73,19 @@ class NativeIntegration(unittest.TestCase):
  def test_stop_and_exception_cannot_fall_through_to_account_recovery(self):
   s=method(self.s,'OnStop');self.assertLess(s.index('ObservationLatched'),s.index('Timer.Stop'));self.assertNotIn('nativeRun.Stop()',s[s.index('Timer.Stop'):])
   s=method(self.s,'OnException');self.assertLess(s.index('ObservationLatched'),s.index('entryStorageFault'))
+ def test_operational_native_minimum_ticket_observation_is_readonly_and_not_order_admission(self):
+  root=ROOT/'research_core_v4/native_tick_replay_v1/operational'
+  observe=(root/'MxmNativeEconomicObservation.cs').read_text()
+  guard=(root/'MxmNativeEstimatedFrictionGuard.cs').read_text()
+  bot=(root/'MxmReferenceProductBot.cs').read_text()
+  self.assertIn('MxmNativeEstimatedFrictionGuard.MinimumTicketNecessaryCapacity(',observe)
+  self.assertIn('MXM_NATIVE_EUR200_MIN_TICKET_JOINT_NECESSARY_ONLY',observe)
+  self.assertIn('actualCommissionEUR=UNKNOWN',observe)
+  self.assertIn('orderAdmission=false accountMutation=false cloudActivation=false',observe)
+  self.assertIn('PASSES_VISIBLE_NECESSARY_ONLY_NO_ADMISSION',guard)
+  self.assertIn('if(phase=="BAR_CALLBACK")ReportNativeMinimumTicketAperture();',bot)
+  segment=method(observe,'ReportNativeMinimumTicketAperture')
+  for banned in ('ExecuteMarketOrder(', 'ClosePosition(', 'LocalStorage', 'MarkSubmitted(',
+                 'MxmBrokerIntentFence','EntryCheckpoint'):
+   self.assertNotIn(banned,segment)
 if __name__=='__main__':unittest.main()

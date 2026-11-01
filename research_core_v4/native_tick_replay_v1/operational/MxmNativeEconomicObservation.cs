@@ -81,6 +81,24 @@ public sealed partial class MxmReferenceProductBot {
    Print("MXM_NATIVE_MIN_TICKET_RISK_HEADROOM symbol={0} minUnits={1} codedLossCapEur={2} nativeStopRiskEur={3:F6} observedSpreadRiskEur={4:F6} additionalSlippageCushionEur={5:F6} maximumTwoSidedCommissionBudgetEur={6:F6} necessaryStopPlusSpreadRoom={7} actualCommissionEur=UNKNOWN expectedNetEur=UNKNOWN brokerFill=false",
      symbol.Name,min,MxmOwnerEntryEnvelope.MaxEstimatedNewEntryLossEur,stopRisk,
      spreadCashEstimate,ExtraSlippageCushionEur,headroom,headroom>0?"POSITIVE_NOT_SUFFICIENT":"NONPOSITIVE");
+   // This first-party C# necessary-only preflight never opens a trade or
+   // claims a round-trip commission, all-position stop risk, EUR NET edge or
+   // executable broker fill. Distinguish an affordable *margin* from the
+   // minimum ticket's combined mark-to-market/cash cost headroom.
+   // It is intentionally limited to observable inputs; unknown broker fees,
+   // swaps, other tickets and cloud recovery can only make admission harder.
+   string necessary=MxmNativeEstimatedFrictionGuard.MinimumTicketNecessaryCapacity(
+     checked((decimal)Account.Equity),checked((decimal)Account.FreeMargin),
+     checked((decimal)buyMargin),checked((decimal)sellMargin),
+     checked((decimal)stopRisk),checked((decimal)spreadCashEstimate),
+     checked((decimal)ExtraSlippageCushionEur),
+     checked((decimal)MinimumFreeMarginReserveEur),
+     checked((decimal)MaxMarginFraction),
+     checked((decimal)(MaxEstimatedMxmStopRiskPercent/100.0)));
+   Print("MXM_NATIVE_EUR200_MIN_TICKET_JOINT_NECESSARY_ONLY symbol={0} status={1} minUnits={2} modeledVisibleSpreadCostEUR={3:F6} slippageCushionEUR={4:F6} minBuyMarginEUR={5:F6} minSellMarginEUR={6:F6} observedStopRiskEUR={7:F6} accountEquityEUR={8:F6} accountFreeMarginEUR={9:F6} accountRiskPercent={10} maxMarginFraction={11} freeMarginReserveEUR={12} actualCommissionEUR=UNKNOWN swapEUR=UNKNOWN existingTicketFullStopRisk=UNKNOWN simultaneousBrokerExecution=false cashNetEdge=UNKNOWN orderAdmission=false accountMutation=false cloudActivation=false",
+     symbol.Name,necessary,min,spreadCashEstimate,ExtraSlippageCushionEur,
+     buyMargin,sellMargin,stopRisk,Account.Equity,Account.FreeMargin,
+     MaxEstimatedMxmStopRiskPercent,MaxMarginFraction,MinimumFreeMarginReserveEur);
   } catch(Exception e) {
    // A read-only unavailable observation is never interpreted as low cost,
    // a missing position or permission to mutate an account.
