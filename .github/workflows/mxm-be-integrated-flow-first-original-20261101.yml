@@ -1,0 +1,97 @@
+name: MXM B-E integrated CSharp M5 causal flow and ONE original R3 economic exposure
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/mxm_be_integrated_volume_flow_20261101.py
+      - research_core_v4/native_tick_replay_v1/csharp/MxmVolumeFlowKernel.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmVolumeFlowResearchFixture.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmVolumeFlowResearchFixture.csproj
+      - research_core_v4/native_tick_replay_v1/operational/MxmReferenceProductBot.cs
+      - research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj
+      - .github/workflows/mxm-be-integrated-flow-first-original-20261101.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-integrated-flow-first-original-20261101.yml
+permissions: {contents: read}
+concurrency:
+  group: mxm-be-m5-flow-one-new-development-original-20261101
+  cancel-in-progress: false
+jobs:
+  causal-single-product-source-blind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile standalone source-blind original algorithm against native CSharp
+        run: |
+          set -eu
+          python3 -m py_compile research_core_v4/laboratory/mxm_be_integrated_volume_flow_20261101.py
+          python3 -m research_core_v4.laboratory.mxm_be_integrated_volume_flow_20261101 selftest
+          DOTNET_ROLL_FORWARD=Major dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmVolumeFlowResearchFixture.csproj -c Release
+      - name: Compile SAME operational native single-cBot with research mode order-denied
+        run: |
+          set -eu
+          dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('research_core_v4/native_tick_replay_v1/operational/MxmReferenceProductBot.cs').read_text()
+          assert 'ObserveVolumeFlowResearch && !NativeObservationOnly' in p
+          assert 'nativeFlowResearch.OnCompletedBar(closed' in p
+          assert 'nativeFlowResearch.Reset();' in p
+          assert 'nativeReceptionSymbol.Tick+=OnNativeReceptionTick' in p
+          assert 'StartNativeObservation();return;' in p
+          assert 'MXM_VOLUME_FLOW_READ_ONLY_CANDIDATE' in p
+          assert 'MxmOwnerEntryEnvelope.Check' in p
+          assert 'entryCheckpoint.PrepareRecoverable' in p
+          print('MXM_BE_SINGLE_NATIVE_ORDER_DENIED_FLOW_CSHARP_BUILD_SUCCESS')
+          PY
+  first-existing-R3-original-development:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    needs: causal-single-product-source-blind
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    environment: mxm-r3-custody-v1
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Admit first exact original exposure only, no rerun or protected-data access
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def get(s):return json.loads(subprocess.check_output(['gh','api',repo+s],text=True))
+          assert os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield'
+          assert os.environ['GITHUB_EVENT_NAME']=='push' and os.environ['GITHUB_RUN_ATTEMPT']=='1'
+          assert get('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA']
+          runs=get('actions/workflows/mxm-be-integrated-flow-first-original-20261101.yml/runs?per_page=100')
+          assert runs['total_count']<=100 and runs['total_count']==len(runs['workflow_runs'])
+          pushed=[z for z in runs['workflow_runs'] if z['event']=='push' and z['head_branch']=='mxm-remediation-p0-p4-20261015-v1']
+          assert len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID'])
+          assert len(get('commits/'+os.environ['GITHUB_SHA'])['parents'])==2
+          print('MXM_BE_FLOW_NEW_UNTUNED_FIRST_ORIGINAL_ONLY')
+          PY
+      - name: Install existing pinned custody dependencies
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Read all 100 original Pepperstone M5 shards; no orders and no alternate provider
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_integrated_volume_flow_20261101 protected
+      - name: Save public aggregate and encrypted individual research only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-volume-flow-first-original-${{ github.run_id }}
+          path: verification/be-integrated-volume-flow-20261101/
+          if-no-files-found: error
+          retention-days: 90
