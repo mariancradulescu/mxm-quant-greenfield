@@ -37,6 +37,7 @@ jobs:
           PY
       - name: Compile existing shared CSharp funded-account harness and run historic source-safe regression
         run: |
+          dotnet build research_core_v4/laboratory/csharp/portfolio_policy/MxmPortfolioPolicy.csproj -c Release
           dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
           python3 -m unittest research_core_v4.laboratory.test_portfolio_programme -v
   first-authentic-eur200-research:
