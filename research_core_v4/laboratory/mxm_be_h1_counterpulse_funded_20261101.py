@@ -117,7 +117,7 @@ def selftest():
   m={}
   for j in range(14):
    t=base-(13-j)*H
-   last=D("1.10") if j==0 else (D("1.15") if j<=8 else D("1.125"))
+   last=D("1.10") if j==0 else (D("1.15") if j<=8 else D("1.138"))
    m[t]=(last,last,last,last)
   return m
  corpus={1:{base-H:(D("1.10"),)*4},5:fake(),111:{},250:{}}
