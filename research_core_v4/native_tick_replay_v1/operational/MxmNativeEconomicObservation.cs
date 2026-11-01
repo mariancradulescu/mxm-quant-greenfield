@@ -94,7 +94,7 @@ public sealed partial class MxmReferenceProductBot {
      checked((decimal)ExtraSlippageCushionEur),
      checked((decimal)MinimumFreeMarginReserveEur),
      checked((decimal)MaxMarginFraction),
-     checked((decimal)(MaxEstimatedMxmStopRiskPercent/100.0));
+     checked((decimal)(MaxEstimatedMxmStopRiskPercent/100.0)));
    Print("MXM_NATIVE_EUR200_MIN_TICKET_JOINT_NECESSARY_ONLY symbol={0} status={1} minUnits={2} modeledVisibleSpreadCostEUR={3:F6} slippageCushionEUR={4:F6} minBuyMarginEUR={5:F6} minSellMarginEUR={6:F6} observedStopRiskEUR={7:F6} accountEquityEUR={8:F6} accountFreeMarginEUR={9:F6} accountRiskPercent={10} maxMarginFraction={11} freeMarginReserveEUR={12} actualCommissionEUR=UNKNOWN swapEUR=UNKNOWN existingTicketFullStopRisk=UNKNOWN simultaneousBrokerExecution=false cashNetEdge=UNKNOWN orderAdmission=false accountMutation=false cloudActivation=false",
      symbol.Name,necessary,min,spreadCashEstimate,ExtraSlippageCushionEur,
      buyMargin,sellMargin,stopRisk,Account.Equity,Account.FreeMargin,
