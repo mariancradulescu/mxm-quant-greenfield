@@ -1,0 +1,90 @@
+name: MXM B-E original triangle parity funded CSharp EUR200 and closed-ledger forensics
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/mxm_be_triangle_parity_funded_20261101.py
+      - research_core_v4/laboratory/MXM_BE_TRIANGLE_PARITY_FUNDED_20261101.json
+      - .github/workflows/mxm-be-triangle-parity-funded-20261101.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-be-triangle-parity-funded-20261101.yml]
+permissions: {contents: read, actions: read}
+concurrency: {group: mxm-be-triangle-parity-original-first-20261101, cancel-in-progress: false}
+jobs:
+  original-source-blind-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify source geometry, correct triangle identity, no future prices, frozen cost & custody
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          python3 -m research_core_v4.laboratory.mxm_be_triangle_parity_funded_20261101 selftest
+          python3 - <<'PY'
+          from research_core_v4.laboratory.mxm_be_triangle_parity_funded_20261101 import spec
+          s=spec()
+          assert s["risk"]["initial_eur"]==200 and s["orders"]==0 and s["cloud"] is False
+          assert s["source"]["new_broker_requests"]==0
+          assert s["mechanism"]["signal_family"]=="TRIANGULAR_FX_PRICING_PARITY"
+          assert s["cost_scenario"]["historical_broker_costs_verified"] is False
+          print("MXM_TRIANGLE_ECONOMIC_COST_NATIVE_SOURCE_BLIND_ADMITTED")
+          PY
+      - name: Reuse and compile original shared CSharp EUR200 funded account without touching the bot
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/portfolio_policy/MxmPortfolioPolicy.csproj -c Release
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_portfolio_programme -v
+  actual-first-source-only:
+    needs: original-source-blind-offline
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 42
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Build existing CSharp funded EUR200 account with pinned dependencies
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+      - name: Original official reviewed first-only custody authorization and bounded source support
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 -m research_core_v4.laboratory.mxm_be_triangle_parity_funded_20261101 admit
+      - name: Read ONLY saved closed PR316 EUR200 original ledger for cost and risk loss attribution
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          gh run download 41347641856 --repo mariancradulescu/mxm-quant-greenfield --name mxm-be-jpy-fourhour-original-41347641856 --dir verification/mxm-be-original-pr316-recon-20261101
+          python3 -m research_core_v4.laboratory.mxm_be_triangle_parity_funded_20261101 forensics
+      - name: Execute ONE independently frozen FX parity family on the actual source and native CSharp EUR200 account
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_triangle_parity_funded_20261101 run
+      - name: Independently cold reconcile authentic new native CSharp ledger without rerunning the model
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_triangle_parity_funded_20261101 cold
+      - name: Save only public closed-model attribution and this new account result, private raw encryption
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-triangle-first-${{ github.run_id }}
+          path: verification/mxm-be-triangle-parity-funded-20261101/
+          if-no-files-found: warn
+          retention-days: 90
