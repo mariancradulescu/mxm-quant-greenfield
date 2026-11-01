@@ -13,6 +13,9 @@ public sealed partial class MxmReferenceProductBot : Robot {
  const string Label="MXM_CSHARP_REFERENCE_V1";
  [Parameter("Native Observation Only",DefaultValue=false)]
  public bool NativeObservationOnly {get;set;}
+ [Parameter("Observe Volume Flow Research",DefaultValue=false)]
+ public bool ObserveVolumeFlowResearch {get;set;}
+ MxmVolumeFlowKernel? nativeFlowResearch;
  readonly MxmNativeRunFence nativeRun=new();
  readonly string nativeReceptionRunId=Guid.NewGuid().ToString("N");
  string? nativeReceptionScopeFingerprint;
@@ -66,6 +69,9 @@ public sealed partial class MxmReferenceProductBot : Robot {
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
+  if(ObserveVolumeFlowResearch && !NativeObservationOnly){
+   Print("MXM_UNQUALIFIED_VOLUME_FLOW_REQUIRES_ORDER_FREE_NATIVE_OBSERVATION");Stop();return;
+  }
   if(ObserveRelativeStrengthPolicy && !NativeObservationOnly){Print("MXM_POLICY_OBSERVATION_REQUIRES_ORDER_FREE_MODE");Stop();return;}
   bool runIsSimulation=NativeObservationOnly ?
    IsBacktesting || RunningMode!=cAlgo.API.RunningMode.RealTime : IsBacktesting;
@@ -223,6 +229,11 @@ public sealed partial class MxmReferenceProductBot : Robot {
    nativeReceptionBars=MarketData.GetBars(TimeFrame,SymbolName);
    if(nativeReceptionSymbol==null || nativeReceptionBars==null)
     throw new InvalidOperationException("NATIVE_OBSERVATION_SOURCE_UNAVAILABLE");
+   if(ObserveVolumeFlowResearch){
+    if(TimeFrame!=cAlgo.API.TimeFrame.Minute5)
+     throw new InvalidOperationException("VOLUME_FLOW_OBSERVATION_M5_ONLY");
+    nativeFlowResearch=new MxmVolumeFlowKernel();
+   }
    StartRelativeStrengthObservation();
    nativeReceptionBook=MxmBookObservations.NativeSnapshots();
    nativeReceptionBook.BeginEpoch(Environment.TickCount64);
@@ -260,7 +271,29 @@ public sealed partial class MxmReferenceProductBot : Robot {
    DateTime closed=DateTime.SpecifyKind(args.Bars.OpenTimes.Last(0),DateTimeKind.Utc);
    if(nativeReceptionLastBar.HasValue && closed<=nativeReceptionLastBar.Value)
     nativeReceptionRepeatedBars=checked(nativeReceptionRepeatedBars+1);
-   if(!nativeReceptionLastBar.HasValue || closed>nativeReceptionLastBar.Value)nativeReceptionLastBar=closed;
+   bool fresh=!nativeReceptionLastBar.HasValue || closed>nativeReceptionLastBar.Value;
+   if(fresh)nativeReceptionLastBar=closed;
+   if(fresh && nativeFlowResearch!=null){
+    DateTime received=DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
+    DateTime nextOpen=closed.AddMinutes(5);
+    // Never let an old callback resurrect an expired signal.
+    if(received<nextOpen || received>=nextOpen.AddMinutes(5)){
+     nativeFlowResearch.Reset();
+     Print("MXM_VOLUME_FLOW_LATE_OR_UNVERIFIED_BAR_COLD_REWARM");
+    } else {
+     double rawVolume=args.Bars.TickVolumes.Last(0);
+     if(!double.IsFinite(rawVolume) || rawVolume<0d ||
+        rawVolume>MxmVolumeFlowKernel.MaxVolume || Math.Truncate(rawVolume)!=rawVolume)
+      throw new InvalidOperationException("VOLUME_FLOW_NATIVE_TICK_VOLUME_INVALID");
+     int direction=nativeFlowResearch.OnCompletedBar(closed,
+      (decimal)args.Bars.OpenPrices.Last(0),(decimal)args.Bars.HighPrices.Last(0),
+      (decimal)args.Bars.LowPrices.Last(0),(decimal)args.Bars.ClosePrices.Last(0),
+      checked((long)rawVolume));
+     if(direction!=0)
+      Print("MXM_VOLUME_FLOW_READ_ONLY_CANDIDATE direction={0} symbol={1} barOpenUtc={2:O} receivedUtc={3:O} completed={4} forecastQualified=false costQualified=false accountAdmitted=false orders=false",
+       direction,SymbolName,closed,received,nativeFlowResearch.CompletedBars);
+    }
+   }
    ReportNativeObservation("BAR_CALLBACK");
   } catch(Exception e) {
    nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_BAR_STOP_"+e.GetType().Name);Stop();
