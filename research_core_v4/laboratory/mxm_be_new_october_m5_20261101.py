@@ -40,8 +40,8 @@ def require_complete_bars(ans,requested_count,expected_account,expected_symbol):
  # Spotware protobuf defines optional hasMore as field 7, but the repository's
  # older generated Python descriptor omits it. Protobuf retains the wire
  # value as an unknown field: do not silently accept hasMore=TRUE.
- need(isinstance(ans,m.ProtoOAGetTrendbarsRes) and ans.IsInitialized(),
-      "NATIVE_TREND_BARS_RESPONSE")
+ need(isinstance(ans,m.ProtoOAGetTrendbarsRes),"NATIVE_TREND_BARS_RESPONSE")
+ need(ans.IsInitialized(),"NATIVE_REQUIRED_FIELDS_"+str(ans.FindInitializationErrors()))
  need(int(ans.ctidTraderAccountId)==int(expected_account) and
       int(ans.period)==ProtoOATrendbarPeriod.Value("M5") and
       (not ans.HasField("symbolId") or int(ans.symbolId)==int(expected_symbol)),
