@@ -1,0 +1,23 @@
+name: MXM prospective M5 open-time and native receipt safety
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/m5_bar_timestamp_admission_20261101.py
+      - .github/workflows/mxm-be-pr302-m5-timestamp-20261101.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-pr302-m5-timestamp-20261101.yml
+permissions: {contents: read}
+jobs:
+  no-secret-prospective-open-time-and-receipt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Enforce bar-open OHLC censoring and native next-event receipt, zero provider keys
+        run: |
+          python3 -m py_compile research_core_v4/laboratory/m5_bar_timestamp_admission_20261101.py
+          python3 -m research_core_v4.laboratory.m5_bar_timestamp_admission_20261101
