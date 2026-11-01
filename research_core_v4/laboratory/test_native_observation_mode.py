@@ -81,12 +81,21 @@ class NativeIntegration(unittest.TestCase):
   economy=(root/'operational/MxmNativeEconomicObservation.cs').read_text()
   project=(root/'operational/MxmOperationalProductBot.csproj').read_text()
   historical=(root/'csharp/MxmReferenceBot.csproj').read_text()
-  self.assertIn('OnNativeCausalPortfolioTarget(target);',policy)
-  self.assertIn('partial void OnNativeCausalPortfolioTarget(MxmPortfolioTarget target);',policy)
+  # Historical reference adapter remains FROZEN, not instrumented or
+  # remapped into a new economic experiment.
+  self.assertNotIn('OnNativeCausalPortfolioTarget(',policy)
+  self.assertIn('StartRelativeStrengthObservation()',policy)
   self.assertIn('MxmNativeCausalOpportunityObservation.cs',project)
   self.assertNotIn('MxmNativeCausalOpportunityObservation.cs',historical)
   self.assertIn('StartNativeCausalOpportunityObservation();',runtime)
   self.assertIn('StopNativeCausalOpportunityObservation();',runtime)
+  self.assertNotIn('StartRelativeStrengthObservation();',runtime)
+  self.assertNotIn('StopRelativeStrengthObservation();',runtime)
+  self.assertIn('observedPortfolioPolicy=new MxmRelativeStrengthPortfolio(roster);',join)
+  self.assertIn('observedPortfolioPolicy.Observe(',join)
+  self.assertEqual(join.count('observedPortfolioPolicy.Observe('),1)
+  self.assertIn('bars.BarClosed+=OnNativeJointPolicyBarClosed;',join)
+  self.assertIn('bars.BarClosed-=OnNativeJointPolicyBarClosed;',join)
   self.assertIn('causalQuoteBooks.TryGetValue(target.Symbol,out var selectedBook)',join)
   self.assertIn('ReportNativeMinimumTicketAperture(selected,selectedBook)',join)
   self.assertIn('target.Reason!="JOINT_RELATIVE_STRENGTH_TARGET"',join)
@@ -98,8 +107,7 @@ class NativeIntegration(unittest.TestCase):
   self.assertIn('var book=selectedBook.ReadBook(Environment.TickCount64)',economy)
   self.assertIn('var symbol=selectedSymbol;',economy)
   for forbidden in ('ExecuteMarketOrder(', 'ClosePosition(', 'LocalStorage', 'MarkSubmitted(',
-                    'new MxmDecisionKernel(', 'new MxmRelativeStrengthPortfolio(',
-                    'ApplyPortfolioDecision(', 'System.Net.'):
+                    'new MxmDecisionKernel(', 'ApplyPortfolioDecision(', 'System.Net.'):
    self.assertNotIn(forbidden,join)
   self.assertEqual(join.count('ReportNativeMinimumTicketAperture(selected,selectedBook)'),1)
   self.assertIn('if(!nativeRun.IsObserving)return;',join)
