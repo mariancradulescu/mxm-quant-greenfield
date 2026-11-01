@@ -234,6 +234,9 @@ public sealed partial class MxmReferenceProductBot : Robot {
      throw new InvalidOperationException("VOLUME_FLOW_OBSERVATION_M5_ONLY");
     nativeFlowResearch=new MxmVolumeFlowKernel();
    }
+   // Quote snapshots are subscribed BEFORE existing causal H1 policy bars,
+   // so the first joint target never silently uses the host chart quote.
+   StartNativeCausalOpportunityObservation();
    StartRelativeStrengthObservation();
    nativeReceptionBook=MxmBookObservations.NativeSnapshots();
    nativeReceptionBook.BeginEpoch(Environment.TickCount64);
@@ -312,6 +315,7 @@ public sealed partial class MxmReferenceProductBot : Robot {
   // Latch before unsubscribe/report: late or reentrant callbacks stay inert.
   nativeRun.Stop();
   StopRelativeStrengthObservation();
+  StopNativeCausalOpportunityObservation();
   if(nativeReceptionSymbol!=null)nativeReceptionSymbol.Tick-=OnNativeReceptionTick;
   if(nativeReceptionBars!=null)nativeReceptionBars.BarClosed-=OnNativeReceptionBarClosed;
   try {
