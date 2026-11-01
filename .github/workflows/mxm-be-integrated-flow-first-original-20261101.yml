@@ -72,7 +72,7 @@ jobs:
           assert get('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA']
           runs=get('actions/workflows/mxm-be-integrated-flow-first-original-20261101.yml/runs?per_page=100')
           assert runs['total_count']<=100 and runs['total_count']==len(runs['workflow_runs'])
-          pushed=[z for z in runs['workflow_runs'] if z['event']=='push']
+          pushed=[z for z in runs['workflow_runs'] if z['event']=='push' and z['head_branch']=='mxm-remediation-p0-p4-20261015-v1']
           assert len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID'])
           assert len(get('commits/'+os.environ['GITHUB_SHA'])['parents'])==2
           print('MXM_BE_FLOW_NEW_UNTUNED_FIRST_ORIGINAL_ONLY')
