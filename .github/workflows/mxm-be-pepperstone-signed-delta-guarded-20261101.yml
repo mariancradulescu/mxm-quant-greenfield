@@ -39,7 +39,6 @@ jobs:
           expected='actions/workflows/mxm-be-pepperstone-signed-delta-guarded-20261101.yml/runs?per_page=100'
           assert expected in workflow
           assert 'actions/workflows/mxm-be-new-pepperstone-bidask-20261101.yml/runs?per_page=100' not in workflow
-          assert 'len(pushes)==1 and pushes[0][' not in '' # do not weaken the real once-only guard
           assert "len(pushes)==1 and pushes[0]['id']==int(os.environ['GITHUB_RUN_ID'])" in workflow
           assert 'from m6.ctrader_transport import StdlibCTraderTransport' in p
           print('MXM_BE_READ_ONLY_BIDASK_SCOPE_AND_SCIENCE_SUCCESS')
