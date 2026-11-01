@@ -175,6 +175,59 @@ def public_loss_attribution():
   "no_lookahead_broker_or_cloud_claim":True}
  flag(outcome["accepted_entries"]==149 and
       abs(net-D("-49.092221988142526"))<D(".000001"),"OLD_PUBLIC_ECONOMIC")
+ # Read ONLY preserved source prices from the *closed* old private account.
+ # This is ex-post analytical attribution; no native model/account rerun.
+ existing={}
+ for t,side,values in d["settled"]:
+  flag(len(values)==4 and int(side) in (-1,1),"OLD_ORIGINAL_SHAPE")
+  key=(qtime(int(t)+300),qtime(int(t)+H))
+  flag(key not in existing,"OLD_SOURCE_UNIQUE")
+  existing[key]=(int(side),[D(str(v)) for v in values])
+ open_entry=None
+ original_mid=D(0);spread_component=D(0);slip_component=D(0);matched=0
+ def conversion(amount,eurj_exit):
+  fx=(D(1)/eurj_exit) if amount>=0 else (D(1)/(eurj_exit-D(".0002")))
+  return amount*fx
+ for line in acc["Ledger"]:
+  if line["Kind"]=="ENTRY":
+   flag(open_entry is None,"OLD_INDEPENDENT_ENTRY_PAIR")
+   open_entry=line
+   continue
+  flag(line["Kind"]=="EXIT" and open_entry is not None,"OLD_INDEPENDENT_EXIT_PAIR")
+  entry=open_entry;open_entry=None
+  when=(entry["Utc"],line["Utc"])
+  flag(when in existing,"OLD_CSHARP_EPISODE_FROM_ORIGINAL_TAPE")
+  side,prices=existing[when]
+  a,b,fx_entry,fx_exit=prices
+  flag(entry["Symbol"]=="AUDJPY" and line["Symbol"]=="AUDJPY" and
+       int(entry["Direction"])==side and int(line["Direction"])==side,
+       "OLD_CSHARP_SIGN")
+  units=D(str(entry["Units"]))
+  spot_mid=(b-a)*D(side)*units
+  mid_gross=conversion(spot_mid,fx_exit)
+  after_spread=conversion(spot_mid-D(".04")*units,fx_exit)
+  after_slip=conversion(spot_mid-(D(".04")+2*D(".005"))*units,fx_exit)
+  actual=D(str(line["GrossEur"]))
+  flag(abs(after_slip-actual)<D(".001"),"OLD_CSHARP_EXACT_PRICE_COST_PARITY")
+  original_mid+=mid_gross
+  spread_component+=mid_gross-after_spread
+  slip_component+=after_spread-actual
+  matched+=1
+ flag(open_entry is None and matched==r["entries"],"OLD_EXACT_CSHARP_MATCHED_ALL_ENTRIES")
+ flag(abs(original_mid-spread_component-slip_component-gross)<D(".000001"),
+       "OLD_MARK_PRICE_COST_ACCOUNTING_IDENTITY")
+ outcome["price_and_cost_attribution"]={
+   "basis":"COUNTERFACTUAL_ORIGINAL_M5_OPEN_TO_OPEN_MID_PRICE_AND_EXIT_FX; NOT_EXECUTED_BIDASK",
+   "matched_existing_native_CSharp_entries":matched,
+   "original_m5_mid_price_gross_eur":float(original_mid),
+   "modeled_spread_component_eur":float(spread_component),
+   "modeled_slippage_component_eur":float(slip_component),
+   "native_filled_quote_gross_eur":float(gross),
+   "modeled_commissions_eur":float(fee),
+   "native_funded_net_eur":float(net),
+   "algebra":"original_mid - modeled_spread - modeled_slippage - modeled_commissions = native_net",
+   "not_historical_cost_proof":True,"no_model_rerun":True
+ }
  OUT.mkdir(parents=True,exist_ok=True)
  (OUT/"closed_pr316_attribution.json").write_bytes(encoded(outcome))
  print("MXM_CLOSED_PR316_NATIVE_FORENSICS_NO_RERUN "+json.dumps(outcome,sort_keys=True),flush=True)
