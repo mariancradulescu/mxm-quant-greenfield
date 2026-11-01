@@ -41,7 +41,11 @@ def require_complete_bars(ans,requested_count,expected_account,expected_symbol):
  # older generated Python descriptor omits it. Protobuf retains the wire
  # value as an unknown field: do not silently accept hasMore=TRUE.
  need(isinstance(ans,m.ProtoOAGetTrendbarsRes),"NATIVE_TREND_BARS_RESPONSE")
- need(ans.IsInitialized(),"NATIVE_REQUIRED_FIELDS_"+str(ans.FindInitializationErrors()))
+ # Vendored schema incorrectly requires deprecated timestamp, while Spotware
+ # currently marks that field optional and says not to use it. Check only
+ # actual required account and period fields, never the stale timestamp.
+ need(ans.HasField("ctidTraderAccountId") and ans.HasField("period"),
+      "NATIVE_REQUIRED_ACCOUNT_AND_PERIOD")
  need(int(ans.ctidTraderAccountId)==int(expected_account) and
       int(ans.period)==ProtoOATrendbarPeriod.Value("M5") and
       (not ans.HasField("symbolId") or int(ans.symbolId)==int(expected_symbol)),
@@ -100,7 +104,7 @@ def selftest():
        row[0]["available_no_earlier_than_utc_ms"]==start+M5,
        "OPEN_TIME_FENCE_AND_BROKER_DIGITS")
  baseline=m.ProtoOAGetTrendbarsRes(ctidTraderAccountId=99,
-      period=ProtoOATrendbarPeriod.Value("M5"),symbolId=17)
+      period=ProtoOATrendbarPeriod.Value("M5"),symbolId=17,timestamp=1234)
  require_complete_bars(baseline,5000,99,17)
  for wire_flag in (0,1):
   candidate=m.ProtoOAGetTrendbarsRes()
