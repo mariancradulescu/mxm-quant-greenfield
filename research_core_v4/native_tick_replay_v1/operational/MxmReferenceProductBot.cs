@@ -237,7 +237,8 @@ public sealed partial class MxmReferenceProductBot : Robot {
    // Quote snapshots are subscribed BEFORE existing causal H1 policy bars,
    // so the first joint target never silently uses the host chart quote.
    StartNativeCausalOpportunityObservation();
-   StartRelativeStrengthObservation();
+   // Do NOT also subscribe the frozen reference adapter: one native H1
+   // policy instance, one causal callback, no duplicate candidate stream.
    nativeReceptionBook=MxmBookObservations.NativeSnapshots();
    nativeReceptionBook.BeginEpoch(Environment.TickCount64);
    nativeReceptionSymbol.Tick+=OnNativeReceptionTick;
@@ -314,7 +315,6 @@ public sealed partial class MxmReferenceProductBot : Robot {
  void StopNativeObservation() {
   // Latch before unsubscribe/report: late or reentrant callbacks stay inert.
   nativeRun.Stop();
-  StopRelativeStrengthObservation();
   StopNativeCausalOpportunityObservation();
   if(nativeReceptionSymbol!=null)nativeReceptionSymbol.Tick-=OnNativeReceptionTick;
   if(nativeReceptionBars!=null)nativeReceptionBars.BarClosed-=OnNativeReceptionBarClosed;
