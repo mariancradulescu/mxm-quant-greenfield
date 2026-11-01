@@ -119,7 +119,7 @@ def selftest():
   # Controlled synthetic gap cannot retain the previous 12-bar state.
   need(flow_signal(src[:11])==0,"WARMUP")
  need(flow_signal(mk(1)[:11])==0,"NO_PREMATURE_FEATURE")
- need(flow_signal(mk(1)[:6]+mk(-1)[6:12])==0,"OPPOSING_FLOW_HOLD")
+ need(flow_signal(mk(1)[:6]+mk(1)[:6])==0,"NO_RECENT_ACCELERATION_HOLD")
  print("MXM_BE_VOLUME_FLOW_PYTHON_SOURCE_BLIND_SUCCESS")
 
 def authentic():
@@ -138,7 +138,7 @@ def authentic():
   "gross_bps_sum":0.,"scenario_after_10bps_sum":0.,"scenario_after_20bps_sum":0.,
   "weekly_proxies":{},"classification":"DEVELOPMENT_ONLY_NOT_BROKER_EUR_NET",
   "quote_side":"M5_NEXT_OPEN_PROXY_NOT_NATIVE_BIDASK",
-  "cost_basis":"HYPOTHETICAL_10_20BPS_NOT_PEPERSTONE_CERTIFIED",
+  "cost_basis":"HYPOTHETICAL_10_20BPS_NOT_PEPPERSTONE_CERTIFIED",
   "funding":"NOT_EVALUATED_NO_FICTITIOUS_EUR200_CAPITAL_PATH",
   "independent_confirmation":False,"historical_margin":False,
   "protected_forward_opened":False,"live_orders":0,"demo_orders":0,"cloud_activations":0,
