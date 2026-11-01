@@ -226,7 +226,10 @@ def original():
    "native_instrument_fees_or_swaps_charged":False,
    "fills_or_live_quote_execution_verified":False,
    "independent_broker_hard21":False,
-   "after_source_selection":False,"broker_requests":0,"orders":0,
+   "source_cost_aggregates_observed_before_hypothesis":True,
+   "individual_price_outcomes_unopened_at_precommit":True,
+   "independent_strategy_confirmation":False,
+   "broker_requests":0,"orders":0,
    "cloud_activations":0,"earlier_window_tuned":False,
    "later_window_retuned":False,"sealed_negative_config_protected":True,
    "alpha_promotion":False}
