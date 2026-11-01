@@ -1,0 +1,116 @@
+{
+  "schema": "mxm.registered-portfolio-policy.v1",
+  "id": "V4-TRIANGLE-EURAUD-EURJPY-AUDJPY-PARITY-20261101",
+  "programme": "MXM_BE_TRIANGLE_PARITY_FUNDED_20261101",
+  "partition": "DEVELOPMENT",
+  "prospective_at_ms": 1793566620000,
+  "orders": 0,
+  "cloud": false,
+  "max_authentic_attempts": 1,
+  "mechanism": {
+    "name": "AUDJPY_TRIANGULAR_NONARBITRAGE_IMPLIED_SPOT_BASIS",
+    "economic_hypothesis": "Compare last completed EURJPY/EURAUD implied AUDJPY to last completed AUDJPY: basis = (EURJPY/EURAUD)/AUDJPY-1. At UTC t use only original H1 observations ending at t-1 and t-2, all chronologically available. If abs(basis)>=0.0005 and native minimum-size implied displacement >=1.25x precommitted estimated roundtrip spread+slippage+fee, trade the underpriced AUDJPY long or overpriced AUDJPY short on original next M5 t+5 open, close on t+60 original M5 open. No continuation data, param search, zero risk loosening, no multi-leg executable arbitrage claim.",
+    "distinct_from_closed": "Mathematical triangular price identity (EURJPY / EURAUD ≈ AUDJPY), not 4h JPY factor momentum/residual, 3h concordance with contrary AUDJPY, monthly H1 3-asset relative efficiency or quote innovation. All are exhausted prior hypotheses; their signal functions are never called.",
+    "signal_family": "TRIANGULAR_FX_PRICING_PARITY",
+    "no_retuning": true,
+    "source_ready_no_opened_outcome": true,
+    "decision_cost_hurdle_ratio": 1.25,
+    "absolute_basis_threshold": 0.0005
+  },
+  "source": {
+    "type": "PINNED_ORIGINAL_M5_DERIVED_ANNUAL_H1_ENCRYPTED_TAPE",
+    "existing_path": "research_core_v4/runtime_inputs/native_h1_annual_20261030",
+    "original_plain_sha256": "7157db48811ed1f1e4583ab567c6e04c876a4c4738c4bd242f182632fff54ebb",
+    "source_part_count": 7,
+    "original_source_two_zip_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "feature_population": "ALL_8_BROKER_ID_FIRST_ORDER_FOREX_NOT_OUTCOME_SELECTED; ONLY_AUDJPY_HAS_NATIVE_CAPTURED_MIN_TICKET_MARGIN_TO_FUND; JPY_FACTOR_AUDJPY_EURJPY_GBPJPY_CHFJPY",
+    "scope_start": "2025-12-01T00:00:00Z",
+    "scope_end_exclusive": "2026-06-01T00:00:00Z",
+    "outcome_reference": "original private next M5 5-minute open and +60minute open",
+    "new_broker_requests": 0,
+    "heldout_independent": false,
+    "triangular_peer_symbols": [
+      "AUDJPY",
+      "EURJPY",
+      "EURAUD"
+    ],
+    "feature_as_of": "2026-11-01T20:57:00Z",
+    "price_admission": "Original H1 end timestamp t-1 and t-2, all 3 original full-hour closing observations; year 2025-2026",
+    "prior_development_exposed": true,
+    "independent_holdout_available": false
+  },
+  "timing": {
+    "data_selection": "Original H1 tape availability, not strategic preference",
+    "input_source": "AUDJPY,EURJPY,EURAUD genuine original-derived complete H1 closes (t-1,t-2), available after t-1+5m",
+    "read_future_only_after_frozen_decisions": true,
+    "entry_exit": "Exact original M5 AUDJPY entry open t+5 and exit open t+60, price mark not historical BIDASK or filled tick",
+    "result_scope": "26 covered weeks in exposed development tape; source-only weekly chronological admission"
+  },
+  "target": {
+    "instruments": [
+      "AUDJPY"
+    ],
+    "reference": [
+      "EURJPY",
+      "EURAUD"
+    ],
+    "margin_proven_for_audjpy": "2026-09-22 Pepperstone Europe LIVE VIEW broker native min 1000 units; buy/sell EUR31.02; immutable original broker source data/BROKER_NATIVE_COMPETITION_UNIVERSE_V1.json",
+    "other_instruments_permanently_excluded": false,
+    "one_single_product_minimum_volume_eur200": true,
+    "multileg_arbitrage_proven": false
+  },
+  "risk": {
+    "initial_eur": 200,
+    "one_account": true,
+    "deposit_count": 1,
+    "reset_count": 0,
+    "max_margin_fraction": 0.4,
+    "free_margin_reserve_eur": 120,
+    "max_estimated_stop_risk_fraction": 0.01,
+    "max_ticket_margin_eur": 80,
+    "roundtrip_risk_reserve_eur": 0.4,
+    "hard21_systemic_not_signals": true,
+    "owner_numeric_caps_not_immutable": true
+  },
+  "cost_scenario": {
+    "spreads_jpy": [
+      "0.02",
+      "0.04",
+      "0.08"
+    ],
+    "baseline_spread_jpy": "0.04",
+    "slippage_per_side_jpy": "0.005",
+    "commission_per_side_eur": "0.04",
+    "minimum_volume_units": "1000",
+    "minimum_margin_eur": "31.02",
+    "stop_distance_jpy": "0.20",
+    "quote_to_eur": "1 / authentic EURJPY original M5 entry/exit open quote (with conservative loss markup)",
+    "history_spreads_observed": false,
+    "historical_commission_fills_proven": false,
+    "intrabar_stop_price_path_observed": false,
+    "finance": "no overnight; no historic swap proof",
+    "interpretation": "dated broker min margin plus fixed monetary friction scenarios; authentic M5 prices, not authentic BIDASK or realized broker PNL; sensitivity paths not combined or chosen retrospectively",
+    "dated_min_volume_margin_unchanged": true,
+    "historical_broker_costs_verified": false,
+    "execution_price_basis": "ORIGINAL_M5_OPEN_PLUS_FROZEN_HYPOTHETICAL_COSTS_NOT_ACTUAL_BIDASK"
+  },
+  "closure": {
+    "nonpositive": "PERMANENTLY_REJECT_TRIANGULAR_IDENTITY_NO_RETUNING",
+    "positive": "DEVELOPMENT_ONLY_WITH_NEW_INDEPENDENT_HOLDOUT_HISTORICAL_BIDASK_FEES_FX_INTRABAR_AND_NATIVE_RECEPTION_REQUIRED",
+    "missing": "NO_OUTCOME_SOURCE_LIMITED",
+    "no_replay_of_previous_identities": true,
+    "cloud_activation": false
+  },
+  "implementation_sha256": {
+    "research_core_v4/laboratory/native_h1_csharp_annual_receipt.py": "d7c52dfe6e784273844c8ce2e93f37b54683c918",
+    "research_core_v4/laboratory/portfolio_programme.py": "a7187967ab0636afc89f09e8d89a9f99bdab1389",
+    "research_core_v4/laboratory/funded_account.py": "ae98a2313bf0e8b28c1776b8bdc13dd0d638758b",
+    "research_core_v4/laboratory/programs.py": "f0a6cdb897d948f6c1ffb5c06b203e1ecff61b68",
+    "research_core_v4/laboratory/csharp/shared_account/Program.cs": "eaeb2c5e7d755181e21d699f94427d3117c7971f",
+    "research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj": "9178d5f1e457e610dcea703be64320336ba32414",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplay.cs": "d8ed580922bad26046ca89e37cc82554c03ff0a7"
+  }
+}
