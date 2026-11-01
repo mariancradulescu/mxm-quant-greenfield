@@ -1,0 +1,103 @@
+{
+  "schema": "mxm.registered-portfolio-policy.v1",
+  "id": "V4-JPY-FOURHOUR-FACTOR-RESIDUAL-20261101",
+  "programme": "MXM_BE_JPY_RESIDUAL_ANNUAL_FUNDED_20261101",
+  "partition": "DEVELOPMENT",
+  "prospective_at_ms": 1793565000000,
+  "orders": 0,
+  "cloud": false,
+  "max_authentic_attempts": 1,
+  "mechanism": {
+    "name": "FOURHOUR_JPY_FACTOR_RESIDUAL_WITH_CROSS_PEER_COHERENCE",
+    "definition": "At UTC hour t: require authentic consecutive H1 closes at t-1..t-5 for AUDJPY, EURJPY, GBPJPY and CHFJPY. Compute 4h returns of 3 JPY references; cross-sectional median minus AUDJPY 4h return is the predeclared residual. If abs(residual)>=0.0015 and peer returns max-min<=0.008, direction is sign(residual); one hour delayed original M5 open entry/exit. Prospectively estimated residual movement scale 0.65 must exceed 1.25 times baseline declared AUDJPY spread+slippage+fee in EUR. Thresholds predeclared before ANY original JPY residual return.",
+    "distinct_from_closed": "Previous V4-JPY-FACTORED-DISCORDANCE-20261101 requires 3h all-peers same sign AND opposite 1h AUDJPY, was executed without preserved economic result and is permanently closed. This is 4h return-relative residual against median reference peers, no unanimity, no last-hour counter-move rule, symmetric long/short residual. Not a retuning, inversion or relaunch of closed identity. Source/time geometry supports comparison without any observed previous economic values.",
+    "prior_closed_identity_never_called": true,
+    "identity_reservation": 1,
+    "no_threshold_search": true,
+    "model_retrained": false
+  },
+  "source": {
+    "type": "PINNED_ORIGINAL_M5_DERIVED_ANNUAL_H1_ENCRYPTED_TAPE",
+    "existing_path": "research_core_v4/runtime_inputs/native_h1_annual_20261030",
+    "original_plain_sha256": "7157db48811ed1f1e4583ab567c6e04c876a4c4738c4bd242f182632fff54ebb",
+    "source_part_count": 7,
+    "original_source_two_zip_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "feature_population": "ALL_8_BROKER_ID_FIRST_ORDER_FOREX_NOT_OUTCOME_SELECTED; ONLY_AUDJPY_HAS_NATIVE_CAPTURED_MIN_TICKET_MARGIN_TO_FUND; JPY_FACTOR_AUDJPY_EURJPY_GBPJPY_CHFJPY",
+    "scope_start": "2025-12-01T00:00:00Z",
+    "scope_end_exclusive": "2026-06-01T00:00:00Z",
+    "outcome_reference": "original private next M5 5-minute open and +60minute open",
+    "new_broker_requests": 0,
+    "heldout_independent": false
+  },
+  "timing": {
+    "decision": "Only t-1..t-5 completed and five-minutes-later available original H1 closes, no future price as feature",
+    "feature_hours": 4,
+    "entry_exit_original_m5": "t+5min original next M5 open, t+60min original M5 open; actual fill/BIDASK unobserved",
+    "sources": "Same pre-pinned 35-week 8FX original-derived tape, 26week chronological prospectively evaluated exposed development",
+    "causal_future_ban": true
+  },
+  "target": {
+    "instruments": [
+      "AUDJPY"
+    ],
+    "reference": [
+      "EURJPY",
+      "GBPJPY",
+      "CHFJPY"
+    ],
+    "margin_proven_for_audjpy": "2026-09-22 Pepperstone Europe LIVE VIEW broker native min 1000 units; buy/sell EUR31.02; immutable original broker source data/BROKER_NATIVE_COMPETITION_UNIVERSE_V1.json",
+    "other_instruments_permanently_excluded": false
+  },
+  "risk": {
+    "initial_eur": 200,
+    "one_account": true,
+    "deposit_count": 1,
+    "reset_count": 0,
+    "max_margin_fraction": 0.4,
+    "free_margin_reserve_eur": 120,
+    "max_estimated_stop_risk_fraction": 0.01,
+    "max_ticket_margin_eur": 80,
+    "roundtrip_risk_reserve_eur": 0.4,
+    "hard21_systemic_not_signals": true,
+    "owner_numeric_caps_not_immutable": true
+  },
+  "cost_scenario": {
+    "spreads_jpy": [
+      "0.02",
+      "0.04",
+      "0.08"
+    ],
+    "baseline_spread_jpy": "0.04",
+    "slippage_per_side_jpy": "0.005",
+    "commission_per_side_eur": "0.04",
+    "minimum_volume_units": "1000",
+    "minimum_margin_eur": "31.02",
+    "stop_distance_jpy": "0.20",
+    "quote_to_eur": "1 / authentic EURJPY original M5 entry/exit open quote (with conservative loss markup)",
+    "history_spreads_observed": false,
+    "historical_commission_fills_proven": false,
+    "intrabar_stop_price_path_observed": false,
+    "finance": "no overnight; no historic swap proof",
+    "interpretation": "dated broker min margin plus fixed monetary friction scenarios; authentic M5 prices, not authentic BIDASK or realized broker PNL; sensitivity paths not combined or chosen retrospectively",
+    "dated_min_volume_margin_unchanged": true,
+    "historical_broker_costs_verified": false
+  },
+  "closure": {
+    "negative": "CLOSE_PERMANENTLY_NO_RETUNING",
+    "positive": "DEVELOPMENT_ONLY; require independent source and actual broker BIDASK historical costs, FX, stops, native Cloud before promotion",
+    "artifact_failure": "PUBLIC_AGGREGATE_RECEIPT_WRITTEN_BEFORE_PRIVATE_CIPHER_FOR_POSTMORTEM; do not auto retry",
+    "prior_family_rerun": false
+  },
+  "implementation_sha256": {
+    "research_core_v4/laboratory/native_h1_csharp_annual_receipt.py": "d7c52dfe6e784273844c8ce2e93f37b54683c918",
+    "research_core_v4/laboratory/portfolio_programme.py": "a7187967ab0636afc89f09e8d89a9f99bdab1389",
+    "research_core_v4/laboratory/funded_account.py": "ae98a2313bf0e8b28c1776b8bdc13dd0d638758b",
+    "research_core_v4/laboratory/programs.py": "f0a6cdb897d948f6c1ffb5c06b203e1ecff61b68",
+    "research_core_v4/laboratory/csharp/shared_account/Program.cs": "eaeb2c5e7d755181e21d699f94427d3117c7971f",
+    "research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj": "9178d5f1e457e610dcea703be64320336ba32414",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplay.cs": "d8ed580922bad26046ca89e37cc82554c03ff0a7"
+  }
+}
