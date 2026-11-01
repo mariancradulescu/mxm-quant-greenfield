@@ -1,0 +1,49 @@
+name: MXM B-E native EUR200 single-account equity conservation
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/native_tick_replay_v1/csharp/MxmEquityConservation.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmEquityConservationFixture.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmEquityConservationFixture.csproj
+      - research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj
+      - research_core_v4/native_tick_replay_v1/operational/MxmReferenceProductBot.cs
+      - research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj
+      - .github/workflows/mxm-be-native-equity-conservation-20261101.yml
+permissions: {contents: read}
+jobs:
+  native-single-account-equity-protection:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Independent CSharp decimal capital-conservation executable
+        run: |
+          set -eu
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmEquityConservationFixture.csproj -c Release
+      - name: Compile real operational and reference CSharp cTrader algo unchanged execution path
+        run: |
+          set -eu
+          dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+      - name: Verify causal pre/post budget, no new order source, same capital account
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          base=Path('research_core_v4/native_tick_replay_v1')
+          p=(base/'operational/MxmReferenceProductBot.cs').read_text()
+          assert p.count('MxmEquityConservation.TryBudget(')==2
+          assert p.count('MxmEquityConservation.Recheck(')==1
+          assert p.index('MxmEquityConservation.Recheck(')<p.index('entryCheckpoint.MarkSubmitted()')
+          assert 'MxmCapitalAdmission.Check(' in p
+          assert 'MxmStopRiskAdmission.Check(' in p
+          assert 'MxmOwnerEntryEnvelope.Check(' in p
+          assert 'MxmEntryCheckpoint.AccountScope(' in p
+          assert 'if(nativeRun.BlocksAccountMutation)return;' in p
+          assert p.count('ExecuteMarketOrder(')==1
+          assert 'ObserveVolumeFlowResearch && !NativeObservationOnly' in p
+          assert 'MxmEquityConservation.cs' in (base/'operational/MxmOperationalProductBot.csproj').read_text()
+          assert 'MxmEquityConservation.cs' in (base/'csharp/MxmReferenceBot.csproj').read_text()
+          print('MXM_BE_EXISTING_SINGLE_CBOT_NO_ADDITIONAL_ENTRY_PATH_SUCCESS')
+          PY
