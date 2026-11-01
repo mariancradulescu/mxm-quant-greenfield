@@ -8,10 +8,6 @@ public sealed partial class MxmReferenceProductBot {
  [Parameter("Observe Relative Strength Policy",DefaultValue=false)]
  public bool ObserveRelativeStrengthPolicy {get;set;}
  MxmRelativeStrengthPortfolio? observedPortfolioPolicy;
- // Single native product may optionally consume an immutable causal target.
- // In the frozen historical reference no implementation exists: compiler
- // erases this partial call. It is NEVER a trading signal subscription.
- partial void OnNativeCausalPortfolioTarget(MxmPortfolioTarget target);
  readonly List<Bars> policyObservationBars=new();
  readonly Dictionary<string,DateTime> policyObservationEnds=new(StringComparer.Ordinal);
  void StartRelativeStrengthObservation() {
@@ -36,11 +32,8 @@ public sealed partial class MxmReferenceProductBot {
    policyObservationEnds[bars.SymbolName]=end;
    if(now<end||now>=end.AddHours(1))return; // delayed/old session closure is unavailable
    var target=observedPortfolioPolicy.Observe(bars.SymbolName,end,(decimal)bars.ClosePrices.Last(0),now);
-   if(target!=null) {
-    Print("MXM_PORTFOLIO_POLICY_OBSERVATION orders=false target={0}",
-     System.Text.Json.JsonSerializer.Serialize(target));
-    OnNativeCausalPortfolioTarget(target);
-   }
+   if(target!=null)Print("MXM_PORTFOLIO_POLICY_OBSERVATION orders=false target={0}",
+    System.Text.Json.JsonSerializer.Serialize(target));
   } catch(Exception e) {
    nativeRun.Stop();Print("MXM_PORTFOLIO_POLICY_OBSERVATION_STOP_"+e.GetType().Name);Stop();
   }
