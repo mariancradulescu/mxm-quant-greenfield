@@ -1,0 +1,86 @@
+name: MXM B-E one authentic H1 counterpulse funded EUR200 CSharp programme
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/mxm_be_h1_counterpulse_funded_20261101.py
+      - research_core_v4/laboratory/MXM_BE_H1_COUNTERPULSE_FUNDED_20261101.json
+      - .github/workflows/mxm-be-h1-counterpulse-funded-20261101.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-be-h1-counterpulse-funded-20261101.yml]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-be-h1-counterpulse-one-first-outcome-20261101
+  cancel-in-progress: false
+jobs:
+  source-blind-native-funded-boundaries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Check prospective H1 12h and 4h causal source, broker costs and existing identity
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          python3 -m research_core_v4.laboratory.mxm_be_h1_counterpulse_funded_20261101 selftest
+          python3 - <<'PY'
+          from research_core_v4.laboratory.mxm_be_h1_counterpulse_funded_20261101 import spec
+          import json
+          p=spec()
+          assert p['risk']['initial_eur']==200
+          assert p['source']['new_broker_requests']==0
+          assert p['cost_scenario']['historical_terms_proven'] is False
+          assert p['cost_scenario']['historical_bidask_proven'] is False
+          print('MXM_BE_H1_COUNTERPULSE_FROZEN_NATIVE_SCENARIO_VERIFIED')
+          PY
+      - name: Compile existing shared CSharp funded-account harness and run historic source-safe regression
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/portfolio_policy/MxmPortfolioPolicy.csproj -c Release
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_portfolio_programme -v
+  first-authentic-eur200-research:
+    needs: source-blind-native-funded-boundaries
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile the same original EUR200 shared native account
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+      - name: Enforce one reviewed merge and first official economic outcome before custody
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 -m research_core_v4.laboratory.mxm_be_h1_counterpulse_funded_20261101 admit
+      - name: Authenticate original Pepperstone H1, evaluate causal policy and one native CSharp EUR200
+        id: economics
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_h1_counterpulse_funded_20261101 run
+      - name: Independently cold reconcile original CSharp EUR200 account without model rerun
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_h1_counterpulse_funded_20261101 cold
+      - name: Preserve encrypted originals and publish only aggregate account evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-h1-counterpulse-first-${{ github.run_id }}
+          path: verification/mxm-be-h1-counterpulse-funded-20261101/
+          retention-days: 90
+          if-no-files-found: warn
