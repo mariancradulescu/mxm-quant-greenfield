@@ -546,8 +546,15 @@ public sealed partial class MxmReferenceProductBot : Robot {
     (decimal)MinimumFreeMarginReserveEur)) {
    Print("MXM_FULL_CASH_COST_POST_ENTRY_RESERVE_HOLD");return;
   }
+  // OWNER EUR200 is the single persistent economic anchor. Other preexisting
+  // risk caps remain DIRECTOR controls and are not relaxed.
+  if(!MxmEquityConservation.TryBudget((decimal)initialEquity,
+     (decimal)MaxMarginFraction,(decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
+     out var equityBudget)) {
+   Print("MXM_EQUITY_BUDGET_UNVERIFIED_SAFE_HOLD");return;
+  }
   string admit=MxmCapitalAdmission.Check((decimal)initialEquity,(decimal)initialFreeMargin,
-    (decimal)margin,nativeFee.PerSideCeilingEur,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
+    (decimal)margin,nativeFee.PerSideCeilingEur,equityBudget.MarginFraction,(decimal)MinimumFreeMarginReserveEur,
     accountOwned,MaxMxmAccountPositions);
   // No claim that API-estimated commission equals an eventual broker charge.
   if(admit!=MxmCapitalAdmission.Admit){Print("MXM_CAPITAL_HOLD_"+admit);return;}
@@ -580,7 +587,7 @@ public sealed partial class MxmReferenceProductBot : Robot {
   }
   string stopRiskGate=MxmStopRiskAdmission.Check(
    (decimal)initialEquity,(decimal)existingRisk,(decimal)newStopRisk,
-   (decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
+   equityBudget.TotalStopFraction,
    observedCostReserve.Value,
    existingTicketCosts.Value);
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
@@ -666,6 +673,21 @@ public sealed partial class MxmReferenceProductBot : Robot {
    new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin,(decimal)finalMargin,(decimal)finalNewStopRisk,(decimal)finalExistingRisk));
   if(finalAccount!=MxmNativeFinalAccountFence.Admit) {
    Print("MXM_FINAL_ACCOUNT_CHANGE_HOLD_"+finalAccount);return;
+  }
+  // Recheck the full account at the tighter of initial and current equity
+  // after durable preparation and before MarkSubmitted. Cold restart never
+  // resets a stored high-water mark because none is trusted/required.
+  if(!MxmEquityConservation.Recheck((decimal)initialEquity,(decimal)finalEquity,
+    (decimal)MaxMarginFraction,(decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
+    out var finalEquityBudget) ||
+    MxmCapitalAdmission.Check((decimal)finalEquity,(decimal)finalFreeMargin,
+      (decimal)finalMargin,nativeFee.PerSideCeilingEur,
+      finalEquityBudget.MarginFraction,(decimal)MinimumFreeMarginReserveEur,
+      accountOwned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit ||
+    MxmStopRiskAdmission.Check((decimal)finalEquity,(decimal)finalExistingRisk,
+      (decimal)finalNewStopRisk,finalEquityBudget.TotalStopFraction,
+      observedCostReserve.Value,finalExistingTicketCosts.Value)!=MxmStopRiskAdmission.Admit) {
+   Print("MXM_FINAL_EQUITY_CONSERVATION_OR_ACCOUNT_RISK_CHANGED_HOLD");return;
   }
   if(!MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
     (decimal)finalFreeMargin,(decimal)finalMargin,observedCostReserve.Value,
@@ -822,7 +844,10 @@ public sealed partial class MxmReferenceProductBot : Robot {
   try {
    decimal equity=(decimal)Account.Equity,free=(decimal)Account.FreeMargin;
    decimal friction=(decimal)EstimatedRoundTripFrictionReserveEur;
-   decimal riskPercent=(decimal)(MaxEstimatedMxmStopRiskPercent/100.0);
+   if(!MxmEquityConservation.TryBudget(equity,(decimal)MaxMarginFraction,
+      (decimal)(MaxEstimatedMxmStopRiskPercent/100.0),out var equityBudget)) {
+    Print("MXM_PRE_SIZING_EQUITY_BUDGET_UNVERIFIED_HOLD");return 0d;
+   }
    // An existing protected position consumes BOTH account stop-risk
    // headroom and its existing friction. A zero-exposure preflight can
    // otherwise choose an over-large ticket and waste a durable intent.
@@ -863,9 +888,9 @@ public sealed partial class MxmReferenceProductBot : Robot {
      if(!costReserve.HasValue || !MxmNativeEstimatedFrictionGuard.PostEntryReserveCovers(
        free,(decimal)margin,costReserve.Value,(decimal)MinimumFreeMarginReserveEur))return false;
      if(MxmCapitalAdmission.Check(equity,free,(decimal)margin,fee.PerSideCeilingEur,
-       (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
+       equityBudget.MarginFraction,(decimal)MinimumFreeMarginReserveEur,
        owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
-     if(MxmStopRiskAdmission.Check(equity,(decimal)existingRisk,(decimal)risk,riskPercent,
+     if(MxmStopRiskAdmission.Check(equity,(decimal)existingRisk,(decimal)risk,equityBudget.TotalStopFraction,
        costReserve.Value,existingTicketCosts.Value)!=MxmStopRiskAdmission.Admit)return false;
      return MxmOwnerEntryEnvelope.Check(free,(decimal)margin,
        fee.PerSideCeilingEur,(decimal)risk,costReserve.Value)==MxmOwnerEntryEnvelope.Admit;
