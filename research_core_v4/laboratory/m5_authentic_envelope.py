@@ -78,31 +78,6 @@ def inspect_rows(rows, segment, bucket):
                     cell["abs_move_ge_%dbps" % bps] += 1
     return (rows[0]["time_utc"], rows[-1]["time_utc"])
 
-# cTrader ProtoOATrendbar.utcTimestampInMinutes is the OPEN timestamp.
-# A complete OHLCV signal cannot be available at that opening timestamp.
-# Even a contiguous NEXT historical bar open is not proof that its first
-# market tick arrived at precisely the nominal opening boundary.
-def nominal_m5_closed_bar_supported(bar_open_ms, next_bar_open_ms, decision_ms):
-    require(all(isinstance(x, int) and x >= 0 for x in
-                (bar_open_ms, next_bar_open_ms, decision_ms)), "M5_AVAIL_TIME_TYPE")
-    return (next_bar_open_ms == bar_open_ms + 300000 and
-            decision_ms >= bar_open_ms + 300000)
-
-def native_live_m5_bar_receipt_admitted(bar_open_ms, next_bar_open_ms,
-                                        next_bar_receipt_ms, decision_ms):
-    """Live admissibility additionally needs a real next-bar receipt time.
-
-    A historical archive has no native arrival-time evidence, so passing None
-    MUST remain fail-closed. Never infer a fill or immediate quote from bars.
-    """
-    if not nominal_m5_closed_bar_supported(bar_open_ms,next_bar_open_ms,decision_ms):
-        return False
-    if next_bar_receipt_ms is None:return False
-    require(isinstance(next_bar_receipt_ms,int) and next_bar_receipt_ms>=0,
-            "NATIVE_BAR_RECEIPT_TYPE")
-    return (next_bar_receipt_ms >= next_bar_open_ms and
-            decision_ms >= next_bar_receipt_ms)
-
 def selftest():
     start = dt.datetime(2026, 8, 20, tzinfo=dt.timezone.utc)
     rows = []
@@ -125,20 +100,6 @@ def selftest():
         require("TIME_FENCE" in str(exc), "SELFTEST_PROTECTION")
     else:
         require(False, "SELFTEST_PROTECTION")
-    # M5 bar stamped 10:25 contains information until nominal 10:30.
-    opened = int(dt.datetime(2026,9,8,10,25,tzinfo=dt.timezone.utc).timestamp()*1000)
-    require(not nominal_m5_closed_bar_supported(opened,opened+300000,opened),
-            "OPEN_BAR_FULL_OHLC_LOOKAHEAD_REJECTED")
-    require(nominal_m5_closed_bar_supported(opened,opened+300000,opened+300000),
-            "NOMINAL_CLOSED_BAR_SUPPORT")
-    require(not nominal_m5_closed_bar_supported(opened,opened+600000,opened+300000),
-            "MISSING_NEXT_BAR_CENSOR")
-    require(not native_live_m5_bar_receipt_admitted(opened,opened+300000,None,opened+300000),
-            "HISTORICAL_NO_ARRIVAL_ASSUMED")
-    require(not native_live_m5_bar_receipt_admitted(opened,opened+300000,opened+300750,opened+300000),
-            "LATE_FIRST_TICK_NOT_LOOKAHEAD")
-    require(native_live_m5_bar_receipt_admitted(opened,opened+300000,opened+300750,opened+301000),
-            "NATIVE_RECEIPT_CONTROLS_BAR_DECISION")
     print("MXM_M5_AUTHENTIC_ENVELOPE_SELFTEST_PASS")
 
 def protected_run(output_dir):
