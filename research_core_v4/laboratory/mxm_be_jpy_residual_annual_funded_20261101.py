@@ -225,7 +225,16 @@ def cold():
   for scenario in ("0.02","0.04","0.08"):
    flag(shared.reconcile(d["native_csharp_"+scenario])==
         r["scenario_results"][scenario],"COLD_EUR200_NATIVE_LEDGER")
- print("MXM_JPY_RESIDUAL_ANNUAL_COLD_NATIVE_FUNDED_PASS",r["run_id"])
+ proof={"schema":"mxm.be.jpy-fourhour.original-native-csharp-cold-readback.v1",
+  "original_run_id":r["run_id"],"original_head":r["head"],
+  "private_cipher_sha256":r["private_cipher_sha256"],
+  "original_ledger_scenarios_verified":sorted(r.get("scenario_results",{})),
+  "original_full_ledger_recomputed_without_economic_policy":True,
+  "model_rerun":False,"source_market_opened":False,"orders":0,"cloud":False,
+  "original_classification":r["classification"]}
+ (OUT/"cold.json").write_bytes(encoded(proof))
+ print("MXM_JPY_RESIDUAL_ANNUAL_COLD_NATIVE_FUNDED_PASS",r["run_id"],
+       json.dumps(proof,sort_keys=True),flush=True)
 
 if __name__=="__main__":
  import sys
