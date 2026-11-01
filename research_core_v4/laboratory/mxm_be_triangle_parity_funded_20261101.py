@@ -31,7 +31,7 @@ SYMBOLS=("AUDJPY","EURJPY","EURAUD")
 BASIS_MIN=D("0.0005")  # fixed 5bps relative cross parity, NOT cost retuned
 COST_MULT=D("1.25")
 BASE=D("0.04")
-ORIGINAL_LEDGER_CIPHER="39aead51b11fa8e80e457d82a519c9e11d4aaec8c80d06439bdcd2f1b8a6"
+ORIGINAL_LEDGER_CIPHER="39aead51b11fa8e80e457d82a519c9e11d4aaec8c80d06439bdcd2b6d2f1b8a6"
 ORIGINAL_LEDGER_RUN=41347641856
 ORIGINAL_LEDGER_HEAD="f5f09a4d06994859fe3214a9ac5d1ab1f06704e5"
 
@@ -73,6 +73,9 @@ def selftest():
  flag(hashlib.sha256(cipher).hexdigest()==original.EXPECTED_CIPHER_SHA,"SELF_CIPHER")
  # Exact non-rounding Decimal-to-JSON custody.
  flag(json.loads(encoded({"n":str(D("1.123400"))}))["n"]=="1.123400","JSON_CUSTODY")
+ from research_core_v4.laboratory import mxm_be_jpy_residual_cold_only_20261101 as prior_cold
+ flag(ORIGINAL_LEDGER_CIPHER==prior_cold.ORIGINAL_PRIVATE_SHA and
+      len(ORIGINAL_LEDGER_CIPHER)==64,"SELF_PREVIOUS_SHA_CERTIFIED")
  print("MXM_TRIANGLE_FAMILY_FROZEN_SOURCE_BLIND_PASS")
 
 def decode(tape):
@@ -172,9 +175,82 @@ def public_loss_attribution():
   "no_lookahead_broker_or_cloud_claim":True}
  flag(outcome["accepted_entries"]==149 and
       abs(net-D("-49.092221988142526"))<D(".000001"),"OLD_PUBLIC_ECONOMIC")
+ # Read ONLY preserved source prices from the *closed* old private account.
+ # This is ex-post analytical attribution; no native model/account rerun.
+ existing={}
+ for t,side,values in d["settled"]:
+  flag(len(values)==4 and int(side) in (-1,1),"OLD_ORIGINAL_SHAPE")
+  key=(qtime(int(t)+300),qtime(int(t)+H))
+  flag(key not in existing,"OLD_SOURCE_UNIQUE")
+  existing[key]=(int(side),[D(str(v)) for v in values])
+ open_entry=None
+ original_mid=D(0);spread_component=D(0);slip_component=D(0);matched=0
+ def conversion(amount,eurj_exit):
+  fx=(D(1)/eurj_exit) if amount>=0 else (D(1)/(eurj_exit-D(".0002")))
+  return amount*fx
+ for line in acc["Ledger"]:
+  if line["Kind"]=="ENTRY":
+   flag(open_entry is None,"OLD_INDEPENDENT_ENTRY_PAIR")
+   open_entry=line
+   continue
+  flag(line["Kind"]=="EXIT" and open_entry is not None,"OLD_INDEPENDENT_EXIT_PAIR")
+  entry=open_entry;open_entry=None
+  when=(entry["Utc"],line["Utc"])
+  flag(when in existing,"OLD_CSHARP_EPISODE_FROM_ORIGINAL_TAPE")
+  side,prices=existing[when]
+  a,b,fx_entry,fx_exit=prices
+  flag(entry["Symbol"]=="AUDJPY" and line["Symbol"]=="AUDJPY" and
+       int(entry["Direction"])==side and int(line["Direction"])==side,
+       "OLD_CSHARP_SIGN")
+  units=D(str(entry["Units"]))
+  spot_mid=(b-a)*D(side)*units
+  mid_gross=conversion(spot_mid,fx_exit)
+  after_spread=conversion(spot_mid-D(".04")*units,fx_exit)
+  after_slip=conversion(spot_mid-(D(".04")+2*D(".005"))*units,fx_exit)
+  actual=D(str(line["GrossEur"]))
+  flag(abs(after_slip-actual)<D(".001"),"OLD_CSHARP_EXACT_PRICE_COST_PARITY")
+  original_mid+=mid_gross
+  spread_component+=mid_gross-after_spread
+  slip_component+=after_spread-actual
+  matched+=1
+ flag(open_entry is None and matched==r["entries"],"OLD_EXACT_CSHARP_MATCHED_ALL_ENTRIES")
+ flag(abs(original_mid-spread_component-slip_component-gross)<D(".000001"),
+       "OLD_MARK_PRICE_COST_ACCOUNTING_IDENTITY")
+ outcome["price_and_cost_attribution"]={
+   "basis":"COUNTERFACTUAL_ORIGINAL_M5_OPEN_TO_OPEN_MID_PRICE_AND_EXIT_FX; NOT_EXECUTED_BIDASK",
+   "matched_existing_native_CSharp_entries":matched,
+   "original_m5_mid_price_gross_eur":float(original_mid),
+   "modeled_spread_component_eur":float(spread_component),
+   "modeled_slippage_component_eur":float(slip_component),
+   "native_filled_quote_gross_eur":float(gross),
+   "modeled_commissions_eur":float(fee),
+   "native_funded_net_eur":float(net),
+   "algebra":"original_mid - modeled_spread - modeled_slippage - modeled_commissions = native_net",
+   "not_historical_cost_proof":True,"no_model_rerun":True
+ }
  OUT.mkdir(parents=True,exist_ok=True)
  (OUT/"closed_pr316_attribution.json").write_bytes(encoded(outcome))
  print("MXM_CLOSED_PR316_NATIVE_FORENSICS_NO_RERUN "+json.dumps(outcome,sort_keys=True),flush=True)
+
+
+def isolated_read_only_forensics():
+ """The *old* forensic has its own strict SHA, paired-trade and CSharp guards.
+ Do not let an ancillary old-ledger failure veto the NEW untouched source
+ and native EUR200 account trial. A failure is plainly and durably recorded.
+ """
+ try:
+  public_loss_attribution()
+ except Exception as err:
+  OUT.mkdir(parents=True,exist_ok=True)
+  note={"schema":"mxm.be.pr316-read-only-forensics-unavailable.v1",
+        "status":"FORENSICS_NOT_COMPLETED","original_run_id":ORIGINAL_LEDGER_RUN,
+        "reason_type":type(err).__name__,"reason":str(err)[:240],
+        "original_digests_relaxed":False,"new_market_source_opened":False,
+        "new_strategy_executed":False,"old_model_rerun":False,
+        "new_strategy_not_dependent_on_old_forensics":True}
+  (OUT/"closed_pr316_attribution_error.json").write_bytes(encoded(note))
+  print("MXM_CLOSED_PR316_FORENSICS_UNAVAILABLE_NOT_ECONOMIC_GATE "+
+        json.dumps(note,sort_keys=True),flush=True)
 
 def first_only():
  flag(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield"
@@ -206,6 +282,52 @@ def first_only():
  flag(not OUT.exists(),"NO_PRIOR_ECONOMIC_OUTPUT")
  selftest();spec()
  print("MXM_TRIANGLE_ORIGINAL_ONE_NATIVE_ECONOMIC_TRIAL_ADMITTED")
+
+
+def recover_admit():
+ # NEW first-only reviewed recovery only for original #41350541329
+ # where immutable archival hash was truncated BEFORE the prior-ledger
+ # cold read, new source, registration, signals or CSharp evaluation.
+ flag(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield"
+      and os.environ.get("GITHUB_REF")=="refs/heads/mxm-remediation-p0-p4-20261015-v1"
+      and os.environ.get("GITHUB_EVENT_NAME")=="push"
+      and os.environ.get("GITHUB_RUN_ATTEMPT")=="1","RECOVERY_ONE_OFFICIAL")
+ def api(path):
+  return json.loads(subprocess.check_output(["gh","api",
+       "repos/mariancradulescu/mxm-quant-greenfield/"+path],text=True))
+ original_run=api("actions/runs/41350541329")
+ flag(original_run["conclusion"]=="failure" and
+      original_run["head_sha"]=="079ad99a9e28b1eda0b3cacbc619d9eb26ea6e8d"
+      and original_run["run_attempt"]==1,"RECOVERY_OLD_FAILURE_IDENTITY")
+ oldart=api("actions/runs/41350541329/artifacts")
+ flag(oldart["total_count"]==0,"RECOVERY_OLD_ECONOMIC_ARTIFACT_EXISTS")
+ jobs=api("actions/runs/41350541329/jobs?per_page=100")
+ j=[x for x in jobs["jobs"] if x["name"]=="actual-first-source-only"]
+ flag(len(j)==1 and j[0]["conclusion"]=="failure","RECOVERY_OLD_JOB")
+ stages={x["name"]:x["conclusion"] for x in j[0]["steps"]}
+ flag(stages["Read ONLY saved closed PR316 EUR200 original ledger for cost and risk loss attribution"]=="failure"
+       and stages["Execute ONE independently frozen FX parity family on the actual source and native CSharp EUR200 account"]=="skipped",
+       "RECOVERY_NO_PRIOR_TRIANGLE_ECONOMIC")
+ head=os.environ["GITHUB_SHA"]
+ flag(api("git/ref/heads/mxm-remediation-p0-p4-20261015-v1")["object"]["sha"]==head,
+      "RECOVERY_HEAD")
+ parents=api("commits/"+head)["parents"]
+ flag(len(parents)==2 and parents[0]["sha"]==
+      "079ad99a9e28b1eda0b3cacbc619d9eb26ea6e8d","RECOVERY_OFFICIAL_MERGE")
+ runs=api("actions/workflows/mxm-be-triangle-parity-one-recovery-20261101.yml/runs?per_page=100")
+ pushes=[r for r in runs["workflow_runs"] if r["event"]=="push" and
+         r["head_branch"]=="mxm-remediation-p0-p4-20261015-v1"]
+ flag(runs["total_count"]<=100 and len(pushes)==1 and
+       pushes[0]["id"]==int(os.environ["GITHUB_RUN_ID"]),"RECOVERY_NO_RELAUNCH")
+ ci=api("actions/runs?event=pull_request&per_page=100")["workflow_runs"]
+ passed={r["name"] for r in ci if r["head_sha"]==parents[1]["sha"] and
+         r["conclusion"]=="success"}
+ flag({"MXM R3 protected technical installation CI",
+       "MXM CSharp Pepperstone protected gateway CI"}<=passed,
+       "RECOVERY_PROTECTED_CI")
+ flag(not OUT.exists(),"RECOVERY_NO_OUTCOME")
+ selftest();spec()
+ print("MXM_TRIANGLE_IDENTICAL_STUDY_FIRST_SOURCE_RECOVERY_AUTHORIZED",flush=True)
 
 def run():
  p=spec()
@@ -312,7 +434,7 @@ def cold():
 
 if __name__=="__main__":
  import sys
- flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","forensics","run","cold"),
+ flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","recover-admit","forensics","run","cold"),
      "ENTRY_USAGE")
  {"selftest":selftest,"admit":first_only,
-  "forensics":public_loss_attribution,"run":run,"cold":cold}[sys.argv[1]]()
+  "recover-admit":recover_admit,"forensics":isolated_read_only_forensics,"run":run,"cold":cold}[sys.argv[1]]()
