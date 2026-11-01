@@ -31,7 +31,7 @@ SYMBOLS=("AUDJPY","EURJPY","EURAUD")
 BASIS_MIN=D("0.0005")  # fixed 5bps relative cross parity, NOT cost retuned
 COST_MULT=D("1.25")
 BASE=D("0.04")
-ORIGINAL_LEDGER_CIPHER="39aead51b11fa8e80e457d82a519c9e11d4aaec8c80d06439bdcd2f1b8a6"
+ORIGINAL_LEDGER_CIPHER="39aead51b11fa8e80e457d82a519c9e11d4aaec8c80d06439bdcd2b6d2f1b8a6"
 ORIGINAL_LEDGER_RUN=41347641856
 ORIGINAL_LEDGER_HEAD="f5f09a4d06994859fe3214a9ac5d1ab1f06704e5"
 
@@ -73,6 +73,9 @@ def selftest():
  flag(hashlib.sha256(cipher).hexdigest()==original.EXPECTED_CIPHER_SHA,"SELF_CIPHER")
  # Exact non-rounding Decimal-to-JSON custody.
  flag(json.loads(encoded({"n":str(D("1.123400"))}))["n"]=="1.123400","JSON_CUSTODY")
+ from research_core_v4.laboratory import mxm_be_jpy_residual_cold_only_20261101 as prior_cold
+ flag(ORIGINAL_LEDGER_CIPHER==prior_cold.ORIGINAL_PRIVATE_SHA and
+      len(ORIGINAL_LEDGER_CIPHER)==64,"SELF_PREVIOUS_SHA_CERTIFIED")
  print("MXM_TRIANGLE_FAMILY_FROZEN_SOURCE_BLIND_PASS")
 
 def decode(tape):
