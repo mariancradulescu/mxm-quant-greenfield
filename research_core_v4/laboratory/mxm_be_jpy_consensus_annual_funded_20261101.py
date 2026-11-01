@@ -73,6 +73,13 @@ def selftest():
  # A future-only mutation never enters the closed-input calculation.
  for v in m.values():v[FIRST+2*H]=D("100000")
  flag(signal(FIRST,m) is None,"SELF_FUTURE_LEAK")
+ parts=sorted(tape_source.CIPHER_DIR.glob("chunk-*.b64"))
+ flag(len(parts)==7,"SELFTEST_ORIGINAL_SOURCE_PARTS")
+ # Reuse the already certified original reader's whitespace-tolerant Base64
+ # semantics. Authenticate the exact ENCRYPTED envelope without any secret.
+ cipher=b"".join(base64.b64decode(q.read_text(),validate=False) for q in parts)
+ flag(hashlib.sha256(cipher).hexdigest()==tape_source.EXPECTED_CIPHER_SHA,
+      "SELFTEST_SOURCE_ENVELOPE_SHA256")
  print("MXM_JPY_FACTOR_ANNUAL_FROZEN_SOURCE_BLIND_SELFTEST_SUCCESS")
 
 def decode(tape):
@@ -252,7 +259,7 @@ def run():
   tmp=pathlib.Path(directory)
   parts=sorted(tape_source.CIPHER_DIR.glob("chunk-*.b64"))
   flag(len(parts)==7,"SEVEN_PINNED_SOURCE_PARTS")
-  blob=b"".join(base64.b64decode(q.read_text(),validate=True) for q in parts)
+  blob=b"".join(base64.b64decode(q.read_text(),validate=False) for q in parts)
   raw=tape_source.decrypt(blob,private.encode(),tmp)
   tape=json.loads(raw)
   m=decode(tape);support=source_admit(m)
