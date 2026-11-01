@@ -77,7 +77,7 @@ def selftest():
  flag(signal(base,m)==1,"SELF_FUTURE_CAUSALITY")
  # All private output numeric observations must be explicitly JSON-safe
  # BEFORE entering protected custody. This closes PR315's material defect.
- test={"settled":[[base,1,[str(D("100.123")),str(D("100.234"))]]}
+ test={"settled":[[base,1,[str(D("100.123")),str(D("100.234"))]]]}
  json.loads(encoded(test))
  parts=sorted(original.CIPHER_DIR.glob("chunk-*.b64"))
  flag(len(parts)==7,"SELF_CIPHERTEXT_COUNT")
