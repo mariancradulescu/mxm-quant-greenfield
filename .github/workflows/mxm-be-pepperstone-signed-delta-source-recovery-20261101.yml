@@ -1,0 +1,93 @@
+name: MXM B-E source-only official cTrader signed tick delta first recovery
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-pepperstone-signed-delta-source-recovery-20261101.yml
+      - research_core_v4/laboratory/mxm_be_new_pepperstone_bidask_20261101.py
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-pepperstone-signed-delta-source-recovery-20261101.yml
+permissions: {contents: read}
+concurrency:
+  group: mxm-be-pepperstone-signed-delta-recovery-20261101
+  cancel-in-progress: false
+jobs:
+  source-blind-read-only-boundaries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install existing pinned Python OpenAPI and encryption libraries
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Verify signed time-and-price delta reconstruction, original order-free source, and failclosed data limits
+        run: |
+          set -eu
+          python3 -m research_core_v4.laboratory.mxm_be_new_pepperstone_bidask_20261101 selftest
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('research_core_v4/laboratory/mxm_be_new_pepperstone_bidask_20261101.py').read_text()
+          assert 'from m6.ctrader_capture import require_read_only_request' in p
+          assert 'need(label in ALLOWED and len(self.requests)<MAX_REQUESTS' in p
+          assert 'ProtoOANewOrderReq' in p and 'not in ALLOWED' in p
+          assert 'require_read_only_request' in p
+          assert 'not side["BID"]["has_more"] and not side["ASK"]["has_more"]' in p
+          assert 'from m6.ctrader_transport import StdlibCTraderTransport' in p
+          print('MXM_BE_READ_ONLY_BIDASK_SCOPE_AND_SCIENCE_SUCCESS')
+          PY
+  isolated-pepperstone-view-source:
+    needs: source-blind-read-only-boundaries
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    environment: mxm-r3-pepperstone-v1
+    timeout-minutes: 15
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify reviewed official first-only request before access to Pepperstone secrets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def read(p):return json.loads(subprocess.check_output(['gh','api',repo+p],text=True))
+          b='mxm-remediation-p0-p4-20261015-v1'
+          assert os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield'
+          assert os.environ['GITHUB_REF']=='refs/heads/'+b and os.environ['GITHUB_RUN_ATTEMPT']=='1'
+          assert read('git/ref/heads/'+b)['object']['sha']==os.environ['GITHUB_SHA']
+          assert len(read('commits/'+os.environ['GITHUB_SHA'])['parents'])==2
+          z=read('actions/workflows/mxm-be-new-pepperstone-bidask-20261101.yml/runs?per_page=100')
+          assert z['total_count']<=100 and z['total_count']==len(z['workflow_runs'])
+          pushes=[x for x in z['workflow_runs'] if x['event']=='push' and x['head_branch']==b]
+          assert len(pushes)==1 and pushes[0]['id']==int(os.environ['GITHUB_RUN_ID'])
+          # The earlier source-only capture 41309837762 failed during decoder
+          # validation, before any economic result or artifact was produced.
+          prior=read('actions/runs/41309837762')
+          assert prior['conclusion']=='failure' and prior['head_sha']=='8d343a4a408edc4ec0ad6814b5fba5283c51f856'
+          print('MXM_PEPPERSTONE_SIGNED_DELTA_READ_ONLY_SOURCE_RECOVERY_ADMITTED')
+          PY
+      - name: Install existing pinned broker transport and public-key encryption only
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Source-only rerun of SAME 4 predeclared symbols and SAME windows, with corrected native signed tick deltas
+        env:
+          R3_CTRADER_CLIENT_ID: ${{ secrets.R3_CTRADER_CLIENT_ID }}
+          R3_CTRADER_CLIENT_SECRET: ${{ secrets.R3_CTRADER_CLIENT_SECRET }}
+          R3_CTRADER_ACCESS_TOKEN: ${{ secrets.R3_CTRADER_ACCESS_TOKEN }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_new_pepperstone_bidask_20261101 protected
+      - name: Preserve bounded public quote-support receipt and encrypted private original
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-pepperstone-signed-delta-recovery-${{ github.run_id }}
+          path: verification/be-pepperstone-new-bidask-20261101/
+          if-no-files-found: error
+          retention-days: 90

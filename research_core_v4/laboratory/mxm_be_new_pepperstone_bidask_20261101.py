@@ -39,15 +39,17 @@ def utc_ms(s):
  t=dt.datetime.fromisoformat(s.replace("Z","+00:00"))
  need(t.utcoffset()==dt.timedelta(0),"UTC");return int(t.timestamp()*1000)
 def decode_side(ticks,start,end):
- """OpenAPI response: newest tick has epoch; next carries delta BACKWARD."""
- out=[];stamp=None
+ """Native newest-first: first epoch and price absolute, later BOTH signed deltas."""
+ out=[];stamp=None;price=None
  for i,tick in enumerate(ticks):
-  rawtime=int(tick.timestamp)
-  stamp=rawtime if i==0 else stamp-rawtime
-  price=int(tick.tick)
-  # Multiple genuine ticks may share the same millisecond (zero delta).
-  need(rawtime>=0 and price>0
-       and start<=stamp<=end and (not out or stamp<=out[-1][0]),
+  delta_time=int(tick.timestamp)
+  delta_price=int(tick.tick)
+  # Relative to the IMMEDIATELY preceding tick, never the first tick.
+  stamp=delta_time if i==0 else stamp+delta_time
+  price=delta_price if i==0 else price+delta_price
+  # Multiple genuine ticks can share the same millisecond (zero delta).
+  need(price>0 and start<=stamp<=end and
+       (i==0 or delta_time<=0 and stamp<=out[-1][0]),
        "TICK_DELTA_CHRONOLOGY_OR_PRICE")
   out.append((stamp,price))
  return list(reversed(out))
@@ -80,10 +82,22 @@ def selftest():
  start=utc_ms("2026-10-27T10:00:00Z")
  class Tick:
   def __init__(self,t,p):self.timestamp=t;self.tick=p
- result=decode_side([Tick(start+1400,100010),Tick(200,100005),
-    Tick(400,100002)],start,start+3000)
+ result=decode_side([Tick(start+1400,100010),Tick(-200,-5),
+    Tick(-400,-3)],start,start+3000)
  need(result==[(start+800,100002),(start+1200,100005),(start+1400,100010)],
       "TICK_RELATIVE_DECODING")
+ zero_delta=decode_side([Tick(start+1400,100010),Tick(0,1)],
+    start,start+3000)
+ need(zero_delta==[(start+1400,100011),(start+1400,100010)],
+      "SAME_MILLISECOND_VALID_NATIVE_QUOTES")
+ try:
+  decode_side([Tick(start+1400,100010),Tick(200,2)],start,start+3000)
+ except ValueError:pass
+ else:need(False,"FORBID_FORWARD_DELTA_IN_NEWEST_FIRST")
+ try:
+  decode_side([Tick(start+1400,100010),Tick(-200,-100011)],start,start+3000)
+ except ValueError:pass
+ else:need(False,"FORBID_NEGATIVE_NATIVE_PRICE")
  ask=[(start+900,100020),(start+1300,100022)]
  vals=spreads(result,ask)
  need(len(vals)>=2 and all(x>0 for x in vals),"STRICT_PRIOR_SPREAD")
