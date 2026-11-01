@@ -232,6 +232,26 @@ def public_loss_attribution():
  (OUT/"closed_pr316_attribution.json").write_bytes(encoded(outcome))
  print("MXM_CLOSED_PR316_NATIVE_FORENSICS_NO_RERUN "+json.dumps(outcome,sort_keys=True),flush=True)
 
+
+def isolated_read_only_forensics():
+ """The *old* forensic has its own strict SHA, paired-trade and CSharp guards.
+ Do not let an ancillary old-ledger failure veto the NEW untouched source
+ and native EUR200 account trial. A failure is plainly and durably recorded.
+ """
+ try:
+  public_loss_attribution()
+ except Exception as err:
+  OUT.mkdir(parents=True,exist_ok=True)
+  note={"schema":"mxm.be.pr316-read-only-forensics-unavailable.v1",
+        "status":"FORENSICS_NOT_COMPLETED","original_run_id":ORIGINAL_LEDGER_RUN,
+        "reason_type":type(err).__name__,"reason":str(err)[:240],
+        "original_digests_relaxed":False,"new_market_source_opened":False,
+        "new_strategy_executed":False,"old_model_rerun":False,
+        "new_strategy_not_dependent_on_old_forensics":True}
+  (OUT/"closed_pr316_attribution_error.json").write_bytes(encoded(note))
+  print("MXM_CLOSED_PR316_FORENSICS_UNAVAILABLE_NOT_ECONOMIC_GATE "+
+        json.dumps(note,sort_keys=True),flush=True)
+
 def first_only():
  flag(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield"
       and os.environ.get("GITHUB_REF")=="refs/heads/mxm-remediation-p0-p4-20261015-v1"
@@ -417,4 +437,4 @@ if __name__=="__main__":
  flag(len(sys.argv)==2 and sys.argv[1] in ("selftest","admit","recover-admit","forensics","run","cold"),
      "ENTRY_USAGE")
  {"selftest":selftest,"admit":first_only,
-  "recover-admit":recover_admit,"forensics":public_loss_attribution,"run":run,"cold":cold}[sys.argv[1]]()
+  "recover-admit":recover_admit,"forensics":isolated_read_only_forensics,"run":run,"cold":cold}[sys.argv[1]]()
