@@ -73,6 +73,38 @@ class NativeIntegration(unittest.TestCase):
  def test_stop_and_exception_cannot_fall_through_to_account_recovery(self):
   s=method(self.s,'OnStop');self.assertLess(s.index('ObservationLatched'),s.index('Timer.Stop'));self.assertNotIn('nativeRun.Stop()',s[s.index('Timer.Stop'):])
   s=method(self.s,'OnException');self.assertLess(s.index('ObservationLatched'),s.index('entryStorageFault'))
+ def test_native_causal_target_and_selected_symbol_economic_join_is_one_readonly_bot(self):
+  root=ROOT/'research_core_v4/native_tick_replay_v1'
+  policy=(root/'csharp/MxmRelativeStrengthNativeObservation.cs').read_text()
+  runtime=(root/'operational/MxmReferenceProductBot.cs').read_text()
+  join=(root/'operational/MxmNativeCausalOpportunityObservation.cs').read_text()
+  economy=(root/'operational/MxmNativeEconomicObservation.cs').read_text()
+  project=(root/'operational/MxmOperationalProductBot.csproj').read_text()
+  historical=(root/'csharp/MxmReferenceBot.csproj').read_text()
+  self.assertIn('OnNativeCausalPortfolioTarget(target);',policy)
+  self.assertIn('partial void OnNativeCausalPortfolioTarget(MxmPortfolioTarget target);',policy)
+  self.assertIn('MxmNativeCausalOpportunityObservation.cs',project)
+  self.assertNotIn('MxmNativeCausalOpportunityObservation.cs',historical)
+  self.assertIn('StartNativeCausalOpportunityObservation();',runtime)
+  self.assertIn('StopNativeCausalOpportunityObservation();',runtime)
+  self.assertIn('causalQuoteBooks.TryGetValue(target.Symbol,out var selectedBook)',join)
+  self.assertIn('ReportNativeMinimumTicketAperture(selected,selectedBook)',join)
+  self.assertIn('target.Reason!="JOINT_RELATIVE_STRENGTH_TARGET"',join)
+  self.assertIn('target.AvailableUtc>now',join)
+  self.assertIn('observedNonFlatCandidates',join)
+  self.assertIn('completeRoundTripCostEUR=UNKNOWN',join)
+  self.assertIn('economicQualified=false entryAuthorized=false orders=false',join)
+  self.assertIn('string ReportNativeMinimumTicketAperture(Symbol? selectedSymbol',economy)
+  self.assertIn('var book=selectedBook.ReadBook(Environment.TickCount64)',economy)
+  self.assertIn('var symbol=selectedSymbol;',economy)
+  for forbidden in ('ExecuteMarketOrder(', 'ClosePosition(', 'LocalStorage', 'MarkSubmitted(',
+                    'new MxmDecisionKernel(', 'new MxmRelativeStrengthPortfolio(',
+                    'ApplyPortfolioDecision(', 'System.Net.'):
+   self.assertNotIn(forbidden,join)
+  self.assertEqual(join.count('ReportNativeMinimumTicketAperture(selected,selectedBook)'),1)
+  self.assertIn('if(!nativeRun.IsObserving)return;',join)
+  self.assertIn('symbol.Tick+=OnNativeCausalQuoteTick;',join)
+  self.assertIn('pair.Value.Tick-=OnNativeCausalQuoteTick;',join)
  def test_operational_native_minimum_ticket_observation_is_readonly_and_not_order_admission(self):
   root=ROOT/'research_core_v4/native_tick_replay_v1/operational'
   observe=(root/'MxmNativeEconomicObservation.cs').read_text()
