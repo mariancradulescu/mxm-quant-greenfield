@@ -31,6 +31,47 @@ public static class MxmNativeEstimatedFrictionGuard {
    return afterCost>=minimumFreeMarginReserveEur;
   }}catch(OverflowException){return false;}
  }
+ /// <summary>
+ /// Current, order-free observation of NECESSARY broker minimum-ticket capacity
+ /// on one EUR account. The only cost inputs are observed spread-cash and an
+ /// explicit slippage cushion; commission, swaps, other open ticket risk,
+ /// broker BIDASK execution and Cloud persistence remain UNKNOWN.
+ /// A pass never constitutes admission and cannot authorize an order.
+ /// A failure is decisive even before adding any missing positive cost.
+ /// </summary>
+ public static string MinimumTicketNecessaryCapacity(
+  decimal equityEur,decimal freeMarginEur,
+  decimal buyMarginEur,decimal sellMarginEur,
+  decimal nativeStopRiskEur,decimal observedSpreadCostEur,
+  decimal slippageCushionEur,decimal minFreeMarginReserveEur,
+  decimal maxMarginFraction,decimal maxStopRiskFraction) {
+  const string unknown="UNVERIFIED_NO_ADMISSION";
+  if(equityEur<=0m || freeMarginEur<0m || freeMarginEur>equityEur ||
+     buyMarginEur<=0m || sellMarginEur<=0m ||
+     nativeStopRiskEur<=0m || observedSpreadCostEur<0m ||
+     slippageCushionEur<0m || minFreeMarginReserveEur<0m ||
+     maxMarginFraction<=0m || maxMarginFraction>1m ||
+     maxStopRiskFraction<=0m || maxStopRiskFraction>1m)
+   return unknown;
+  try {checked {
+   decimal cost=observedSpreadCostEur+slippageCushionEur;
+   if((observedSpreadCostEur>0m || slippageCushionEur>0m) &&
+      cost<=Math.Max(observedSpreadCostEur,slippageCushionEur))
+    return unknown;
+   decimal stopPlusKnownCost=nativeStopRiskEur+cost;
+   if(cost>0m && stopPlusKnownCost<=nativeStopRiskEur)return unknown;
+   // Risk and margin are BOTH necessary even before unknown broker fees,
+   // other existing positions and finite after-stop account valuation.
+   if(stopPlusKnownCost>equityEur*maxStopRiskFraction)
+    return "STOP_PLUS_VISIBLE_COST_NECESSARY_FAIL";
+   decimal marginLimit=equityEur*maxMarginFraction;
+   if(buyMarginEur>marginLimit || sellMarginEur>marginLimit ||
+      !PostEntryReserveCovers(freeMarginEur,buyMarginEur,cost,minFreeMarginReserveEur) ||
+      !PostEntryReserveCovers(freeMarginEur,sellMarginEur,cost,minFreeMarginReserveEur))
+    return "MIN_VOLUME_MARGIN_AND_CASH_RESERVE_NECESSARY_FAIL";
+   return "PASSES_VISIBLE_NECESSARY_ONLY_NO_ADMISSION";
+  }}catch(OverflowException){return unknown;}
+ }
  /// <summary>Cost floors for ACTUAL existing MXM broker tickets, one per
  /// symbol/volume. Never substitute proposed-ticket cost times position count.
  /// Missing cost, negative cost or decimal precision loss blocks admission.
