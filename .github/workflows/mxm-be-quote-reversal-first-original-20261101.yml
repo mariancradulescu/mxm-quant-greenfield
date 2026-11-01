@@ -49,7 +49,7 @@ jobs:
         with: {persist-credentials: false}
       - name: First-only, authentic source artifact, pre-reviewed official merge and unchanged owner source gate
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
           python3 - <<'PY'
@@ -78,8 +78,8 @@ jobs:
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: ONE authenticated first outcome from already conserved bid/ask with independent later date
         env:
-          GH_TOKEN: \${{ github.token }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: \${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
         run: |
           set -eu
           umask 077
@@ -87,7 +87,7 @@ jobs:
       - name: Preserve public aggregate and encrypted individual directional outcomes; zero broker calls
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: mxm-be-authentic-bidask-first-quote-reversal-\${{ github.run_id }}
+          name: mxm-be-authentic-bidask-first-quote-reversal-${{ github.run_id }}
           path: verification/be-quote-reversal-20261101/
           retention-days: 90
           if-no-files-found: error
