@@ -30,7 +30,9 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           p=Path('research_core_v4/laboratory/mxm_be_new_pepperstone_bidask_20261101.py').read_text()
-          assert 'ProtoOANewOrderReq' not in p.replace('"ProtoOANewOrderReq" not in ALLOWED','') or True
+          assert 'from m6.ctrader_capture import require_read_only_request' in p
+          assert 'need(label in ALLOWED and len(self.requests)<MAX_REQUESTS' in p
+          assert 'ProtoOANewOrderReq' in p and 'not in ALLOWED' in p
           assert 'require_read_only_request' in p
           assert 'not side["BID"]["has_more"] and not side["ASK"]["has_more"]' in p
           assert 'from m6.ctrader_transport import StdlibCTraderTransport' in p
