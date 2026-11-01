@@ -36,10 +36,10 @@ static class Programme {
   Need(MxmCapitalAdmission.Check(180m,180m,70m,.01m,
      shrink.MarginFraction,120m,0,1)!=MxmCapitalAdmission.Admit,
      "LOWER_EQUITY_CANNOT_REUSE_ORIGINAL_VOLUME");
-  Need(MxmStopRiskAdmission.Check(200m,0m,1.1m,
+  Need(MxmStopRiskAdmission.Check(200m,0m,1.5m,
      original.TotalStopFraction,.1m,0m)==MxmStopRiskAdmission.Admit,
      "HISTORIC_STOP_ACCEPTS");
-  Need(MxmStopRiskAdmission.Check(180m,0m,1.1m,
+  Need(MxmStopRiskAdmission.Check(180m,0m,1.5m,
      shrink.TotalStopFraction,.1m,0m)!=MxmStopRiskAdmission.Admit,
      "LOWER_EQUITY_SHRINKS_TOTAL_STOP_EXPOSURE");
   Console.WriteLine("MXM_EQUITY_CONSERVATION_NATIVE_SINGLE_ACCOUNT_SUCCESS");
