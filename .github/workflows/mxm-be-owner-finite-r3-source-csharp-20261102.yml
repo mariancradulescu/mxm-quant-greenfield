@@ -25,9 +25,9 @@ jobs:
         run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Preflight immutable source scope, M5 close-time and no order messages
         run: python3 -m research_core_v4.laboratory.mxm_be_owner_finite_broker_csharp_20261102 selftest
-      - name: Compile existing EUR200 economic CSharp engine and single cTrader product
+      - name: Compile existing shared-funded EUR200 CSharp engine and single cTrader product
         run: |
-          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
           test -s research_core_v4/native_tick_replay_v1/operational/bin/Release/net6.0/*.algo
   first-official-original-and-csharp:
@@ -71,12 +71,12 @@ jobs:
           set -eu
           umask 077
           python3 -m research_core_v4.laboratory.mxm_be_owner_finite_broker_csharp_20261102 source
-      - name: Execute existing funded CSharp engine on the SAME authentic source
+      - name: Execute unchanged shared-funded CSharp EUR200 account on new authentic market events
         run: |
           set -eu
           umask 077
-          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
-          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --be-owner-r3-readonly "${RUNNER_TEMP}/mxm-be-owner-r3-finite/quotes.ndjson" "${RUNNER_TEMP}/mxm-be-owner-r3-finite/csharp"
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          dotnet run --project research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release --no-build -- "${RUNNER_TEMP}/mxm-be-owner-r3-finite/account-request.json" - "${RUNNER_TEMP}/mxm-be-owner-r3-finite/csharp/account-report.json"
       - name: Cold verify source hash, CSharp EUR200 ledger, encrypt and erase raw runner inputs
         run: |
           set -eu
