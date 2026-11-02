@@ -202,7 +202,9 @@ def collect(file):
         bar_res = bound.request(bar_req, timeout=30)
         require_complete_bars(bar_res, op["max_bars"], account, sid)
         bars = decode_bars(bar_res.trendbar, int(matches[0].digits), start, end)
-        need(8 <= len(bars) <= op["max_bars"], "COMPLETE_M5_BARS")
+        need(8 <= len(bars) <= op["max_bars"] and
+         all(row["available_no_earlier_than_utc_ms"] <= end for row in bars),
+         "COMPLETE_M5_BARS")
         ticks, windows = [], []
         step = (end - start) // op["slices"]
         for i in range(op["slices"]):
@@ -274,6 +276,8 @@ def seal(file):
          sha(q) == manifest["quotes_sha256"], "ORIGINAL_TO_QUOTES")
     request = (p/"account-request.json").read_bytes()
     need(sha(request) == manifest["csharp_request_sha256"], "REQUEST_HASH")
+    need(canon(csharp_feed(op, original["bidask"], sha(q))) == request,
+         "REGENERATED_ORIGINAL_TO_CSHARP_EVENTS")
     x = json.loads(request)
     need(x["SourceSha256"] == sha(q) and x["ExpectedOrdinal"] == 0 and
          x["PriorSha256"] is None and
