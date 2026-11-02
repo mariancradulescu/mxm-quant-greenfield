@@ -1,0 +1,93 @@
+name: MXM BE OWNER one finite R3 read-only Pepperstone source to existing CSharp EUR200 engine
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-owner-finite-r3-source-csharp-20261102.yml
+      - research_core_v4/laboratory/mxm_be_owner_finite_broker_csharp_20261102.py
+      - research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-be-owner-finite-r3-source-csharp-20261102.yml
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-be-owner-finite-r3-source-csharp-20261102
+  cancel-in-progress: false
+jobs:
+  read-only-contract-and-native-csharp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install pinned existing cTrader read-only transport dependencies
+        run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Preflight immutable source scope, M5 close-time and no order messages
+        run: python3 -m research_core_v4.laboratory.mxm_be_owner_finite_broker_csharp_20261102 selftest
+      - name: Compile existing shared-funded EUR200 CSharp engine and single cTrader product
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
+          test -s research_core_v4/native_tick_replay_v1/operational/bin/Release/net6.0/*.algo
+  first-official-original-and-csharp:
+    needs: read-only-contract-and-native-csharp
+    if: github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    environment: mxm-r3-pepperstone-v1
+    timeout-minutes: 18
+    permissions: {contents: read, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Admit exact first new reviewed official workflow before access to secrets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def read(p):return json.loads(subprocess.check_output(['gh','api',repo+p],text=True))
+          b='mxm-remediation-p0-p4-20261015-v1'
+          w='mxm-be-owner-finite-r3-source-csharp-20261102.yml'
+          assert os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield'
+          assert os.environ['GITHUB_REF']=='refs/heads/'+b and os.environ['GITHUB_RUN_ATTEMPT']=='1'
+          assert read('git/ref/heads/'+b)['object']['sha']==os.environ['GITHUB_SHA']
+          z=read('actions/workflows/'+w+'/runs?per_page=100')
+          assert z['total_count']<=100 and z['total_count']==len(z['workflow_runs'])
+          pushed=[x for x in z['workflow_runs'] if x['event']=='push' and x['head_branch']==b]
+          assert len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID'])
+          print('MXM_OWNER_ONE_NEW_REVIEWED_READ_ONLY_R3_SOURCE_ADMITTED')
+          PY
+      - name: Install pinned existing transport and encryption; no private custody key
+        run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Collect ONE bounded 2026-11-02 EURUSD M5 and two-sided quotes read-only
+        env:
+          R3_CTRADER_CLIENT_ID: ${{ secrets.R3_CTRADER_CLIENT_ID }}
+          R3_CTRADER_CLIENT_SECRET: ${{ secrets.R3_CTRADER_CLIENT_SECRET }}
+          R3_CTRADER_ACCESS_TOKEN: ${{ secrets.R3_CTRADER_ACCESS_TOKEN }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_owner_finite_broker_csharp_20261102 source
+      - name: Execute unchanged shared-funded CSharp EUR200 account on new authentic market events
+        run: |
+          set -eu
+          umask 077
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          dotnet run --project research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release --no-build -- "${RUNNER_TEMP}/mxm-be-owner-r3-finite/account-request.json" - "${RUNNER_TEMP}/mxm-be-owner-r3-finite/csharp/account-report.json"
+      - name: Cold verify source hash, CSharp EUR200 ledger, encrypt and erase raw runner inputs
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.mxm_be_owner_finite_broker_csharp_20261102 seal
+          rm -rf "${RUNNER_TEMP}/mxm-be-owner-r3-finite"
+      - name: Retain only encrypted original and CSharp ledger plus public hashes and scope
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-be-owner-finite-r3-source-csharp-${{ github.run_id }}
+          path: verification/mxm-be-owner-finite-r3-source-csharp-20261102/
+          if-no-files-found: warn
+          retention-days: 90
