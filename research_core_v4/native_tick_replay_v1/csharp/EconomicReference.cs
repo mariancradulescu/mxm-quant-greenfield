@@ -255,6 +255,26 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
+   // OWNER 2026-11-02 finite, read-only original Pepperstone source reception.
+   // Same Replay, capital/risk/cost components as all existing CSharp research.
+   // All values apart from incoming broker BIDASK are assumptions, NOT fills.
+   if(args.Length==3 && args[0]=="--be-owner-r3-readonly"){
+    if(!File.Exists(args[1]))throw new FileNotFoundException("ONE_NEW_AUTHENTIC_INPUT_REQUIRED");
+    var original=Read(args[1]);
+    var outcome=new Replay(false,true,StrategyMode.Adaptive,5,
+       0.00002m,0.03m,0.00004m,50m,12,0.4m,ExitMode.Horizon12,
+       120m,0.01m,0.20m).Run(original);
+    Directory.CreateDirectory(args[2]);
+    File.WriteAllText(Path.Combine(args[2],"reference-report.json"),
+       JsonSerializer.Serialize(outcome,new JsonSerializerOptions{WriteIndented=true}));
+    Console.WriteLine(JsonSerializer.Serialize(new{
+       status="MXM_BE_OWNER_EXISTING_CSHARP_PEPPERSTONE_SOURCE_BRIDGE",
+       quote_events=original.Count,capital_initial_eur=200m,
+       risk_budget_fraction=0.01m,max_margin_eur=80m,
+       minimum_free_reserve_eur=120m,orders=0,
+       independent_alpha_proven=false,native_broker_fills_proven=false}));
+    return 0;
+   }
    if(args.Length==3 && (args[0]=="--risk-capacity-research"||args[0]=="--risk-capacity-fixture")){
     bool artificial=args[0]=="--risk-capacity-fixture";
     if(!artificial&&!File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
