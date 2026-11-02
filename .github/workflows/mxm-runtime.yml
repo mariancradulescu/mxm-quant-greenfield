@@ -1,9 +1,8 @@
-name: MXM Runtime isolated preflight (no credentials)
+name: MXM Runtime isolated read-only source-to-CSharp
 
 on:
   push:
-    branches:
-      - mxm-runtime-isolated-20261102
+    branches: [mxm-runtime-isolated-20261102]
     paths:
       - '.github/workflows/mxm-runtime.yml'
       - 'mxm_runtime/**'
@@ -13,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: mxm-runtime-isolated-preflight-${{ github.ref }}
+  group: mxm-runtime-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -21,30 +20,88 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - name: Checkout only isolated branch; no persisted credentials
+      - name: Checkout one isolated workflow with no persisted credentials
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Enforce exactly one active workflow in isolated branch
+      - name: Check structural isolation and offline Python syntax
         shell: bash
         run: |
           set -euo pipefail
           test "$(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | wc -l)" -eq 1
-          test -f .github/workflows/mxm-runtime.yml
-      - name: Validate new operation contract offline
-        shell: bash
-        run: |
-          set -euo pipefail
+          python3 -m py_compile mxm_runtime/contract.py mxm_runtime/operation.py
           python3 -m mxm_runtime.contract selftest
-      - name: Validate unchanged read-only transport and broker decoder offline
+      - name: Test existing read-only transport/decoder without secrets
         shell: bash
         run: |
           set -euo pipefail
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
           python3 -m research_core_v4.laboratory.mxm_be_owner_finite_broker_csharp_20261102 selftest
-      - name: Build unchanged shared-funded EUR200 CSharp and single Cloud bot offline
+      - name: Compile existing EUR200 shared-account host and cBot
         shell: bash
         run: |
           set -euo pipefail
           dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
+
+  collect-authenticated:
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/mxm-runtime-isolated-20261102' &&
+      github.run_attempt == 1 &&
+      contains(github.event.head_commit.message, '[MXM-COLLECT]')
+    needs: validate-no-secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    environment: mxm-r3-pepperstone-v1
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout operation and its parent for immutable admission
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Install pinned existing read-only transport dependencies
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Admit exactly one newly committed authorization before secrets
+        id: admission
+        env:
+          MXM_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 -m mxm_runtime.operation admit -
+      - name: Collect bounded Pepperstone LIVE VIEW market history (no orders)
+        env:
+          R3_CTRADER_CLIENT_ID: ${{ secrets.R3_CTRADER_CLIENT_ID }}
+          R3_CTRADER_CLIENT_SECRET: ${{ secrets.R3_CTRADER_CLIENT_SECRET }}
+          R3_CTRADER_ACCESS_TOKEN: ${{ secrets.R3_CTRADER_ACCESS_TOKEN }}
+          MXM_OPERATION_FILE: ${{ steps.admission.outputs.operation }}
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 -m mxm_runtime.operation collect "$MXM_OPERATION_FILE"
+      - name: Execute existing EUR200 native shared-funded CSharp host
+        run: |
+          set -euo pipefail
+          umask 077
+          dotnet run --project research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release -- "${RUNNER_TEMP}/mxm-runtime-private/account-request.json" - "${RUNNER_TEMP}/mxm-runtime-private/account-report.json"
+      - name: Cold-check original-to-CSharp SHA chain and EUR200 ledger
+        env:
+          MXM_OPERATION_FILE: ${{ steps.admission.outputs.operation }}
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 -m mxm_runtime.operation seal "$MXM_OPERATION_FILE"
+      - name: Upload only encrypted originals and signed-off public hashes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-runtime-readonly-${{ github.run_id }}
+          path: verification/mxm-runtime/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Remove plaintext original, account request and report from runner
+        if: always()
+        run: rm -rf "${RUNNER_TEMP}/mxm-runtime-private"
