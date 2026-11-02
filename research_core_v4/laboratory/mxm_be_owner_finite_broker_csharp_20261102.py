@@ -77,6 +77,69 @@ def selftest():
          "COMPLETE_BAR_ALIGNMENT")
     print("MXM_OWNER_FINITE_R3_SOURCE_BLIND_SCOPE_PASS")
 
+
+def iso_ms(t):
+    return dt.datetime.fromtimestamp(t/1000,dt.timezone.utc).isoformat(
+        timespec="milliseconds").replace("+00:00","Z")
+
+# A fixed scheduled EUR200 accounting bridge, not a new alpha hypothesis.
+# The two decisions and the risk/fee model are fixed before live source access;
+# never infer the decision from price movement or hindsight.
+POLICY_BYTES=b"MXM-OWNER-20261102-EURUSD-FIXED-0320-LONG-0340-FLAT-READONLY-CASH-BRIDGE"
+SIZING_BYTES=b"MXM-OWNER-20261102-1000UNITS-50EURMARGIN-120EURRESERVE-1PCTSTOP-READONLY"
+POLICY_SHA=sha(POLICY_BYTES)
+SIZING_SHA=sha(SIZING_BYTES)
+DECISIONS=((ms("2026-11-02T03:20:00Z"),1),
+           (ms("2026-11-02T03:40:00Z"),0))
+def csharp_request(ticks,raw_sha):
+    need(len(ticks)>0 and len(DECISIONS)==2,"FIXED_CSHARP_SOURCE")
+    events=[]
+    bid=ask=None; tb=ta=None
+    seen=set()
+    # Broker-native sampled sides are paired at or after their last source times,
+    # never used as fictitious synchronous exchange quotes.
+    from itertools import groupby
+    for t,stream in groupby(ticks,key=lambda x:x["t"]):
+        items=list(stream)
+        bvalues={x["raw"] for x in items if x["side"]=="bid"}
+        avalues={x["raw"] for x in items if x["side"]=="ask"}
+        if len(bvalues)>1 or len(avalues)>1:continue
+        if bvalues:bid=next(iter(bvalues));tb=t
+        if avalues:ask=next(iter(avalues));ta=t
+        if bid is None or ask is None or bid<=0 or ask<=bid:continue
+        if t-tb>5000 or t-ta>5000:continue
+        if t in seen:continue
+        seen.add(t)
+        qbid=round(bid/100000,5);qask=round(ask/100000,5)
+        events.append({"$feed":"quote","Utc":iso_ms(t),"Symbol":SYMBOL,
+          "Bid":qbid,"Ask":qask,"QuoteToEur":round(1/qask,12),
+          "QuoteLossToEur":round(1/qbid,12),"ExecutableUnits":1000,
+          "InitialMarginEur":50,"CommissionPerSideEur":0.03,
+          "SlipPerSideQuote":0.00002,"EstimatedStopRiskEur":1.2,
+          "StopDistanceQuote":0.0012,"BidSourceUtc":iso_ms(tb),
+          "AskSourceUtc":iso_ms(ta),
+          "NativeSizingScenarioSha256":SIZING_SHA,
+          "BrokerVolumeMinUnits":1000,"BrokerVolumeMaxUnits":1000,
+          "BrokerVolumeStepUnits":1000})
+    for i,(t,side) in enumerate(DECISIONS,1):
+        events.append({"$feed":"explicit-decision","Utc":iso_ms(t),
+          "Symbol":SYMBOL,"Sequence":i,"Desired":side,
+          "ValidFromUtc":iso_ms(t+1),"ExpiresUtc":iso_ms(t+240000),
+          "PolicySha256":POLICY_SHA})
+    events.sort(key=lambda x:(x["Utc"],0 if x["$feed"]=="explicit-decision" else 1))
+    need(len(events)>=100 and
+         sum(x["$feed"]=="explicit-decision" for x in events)==2 and
+         len(events)<100000,"BOUNDED_NATIVE_CSHARP_FEED")
+    return {"Schema":"mxm.shared-funded-account.request.v1",
+      "SourceSha256":raw_sha,"Symbols":[SYMBOL],
+      "Parameters":{"Strategy":0,"MaxMarginFraction":0.4,
+        "MaxPositions":1,"MinimumFreeMarginReserveEur":120,
+        "MaxEstimatedStopRiskFraction":0.01,"RoundTripRiskReserveEur":0.2,
+        "BarMinutes":5,"MaxQuoteAgeSeconds":300,
+        "ExplicitPolicySha256":POLICY_SHA,
+        "NativeSizingScenarioSha256":SIZING_SHA},
+      "ExpectedOrdinal":0,"PriorSha256":None,"Events":events}
+
 def source():
     selftest()
     need(os.getenv("GITHUB_REPOSITORY")==REPO and
@@ -152,6 +215,9 @@ def source():
         p=private_dir()
         p.mkdir(parents=True,exist_ok=False)
         (p/"quotes.ndjson").write_bytes(lines)
+        request=csharp_request(ticks,sha(lines))
+        (p/"account-request.json").write_text(json.dumps(request,separators=(",",":"),sort_keys=True))
+        (p/"csharp").mkdir()
         (p/"bars.json").write_text(json.dumps(
              {"symbol":SYMBOL,"bars":bars},sort_keys=True))
         OUT.mkdir(parents=True,exist_ok=False)
@@ -166,6 +232,10 @@ def source():
           "bounded_slices":boundaries,"wire_requests":bound.requests,
           "source_plain_sha256":sha(raw),
           "csharp_input_ndjson_sha256":sha(lines),
+          "csharp_account_request_sha256":sha((p/"account-request.json").read_bytes()),
+          "fixed_account_policy_sha256":POLICY_SHA,
+          "fixed_account_sizing_sha256":SIZING_SHA,
+          "csharp_feed_events":len(request["Events"]),
           "encrypted_source_sha256":sha((OUT/"original.mxmenc").read_bytes()),
           "orders":0,"demo_orders":0,"cloud_activations":0,
           "full_independent_alpha_confirmation":False,
@@ -181,77 +251,83 @@ def source():
         for key in SECRETS:os.environ.pop(key,None)
         tr.close()
 
+
 def seal():
     need(os.getenv("GITHUB_REPOSITORY")==REPO and
          os.getenv("GITHUB_REF")=="refs/heads/"+BRANCH and
          os.getenv("GITHUB_RUN_ATTEMPT")=="1","OFFICIAL_SEAL_ONLY")
     need(not any(os.getenv(x) for x in SECRETS) and
-         not os.getenv("R3_CUSTODY_PRIVATE_KEY_PEM"),"NO_BROKER_OR_CUSTODY_SECRETS_IN_CSHARP")
+         not os.getenv("R3_CUSTODY_PRIVATE_KEY_PEM"),"ISOLATED_NO_SECRETS")
     p=private_dir()
     pub=json.loads((OUT/"source-public.json").read_text())
     quotes=(p/"quotes.ndjson").read_bytes()
-    need(sha(quotes)==pub["csharp_input_ndjson_sha256"],"SOURCE_TO_CSHARP_SHA_BIND")
-    raw=(p/"csharp"/"reference-report.json").read_bytes()
-    report=json.loads(raw)
-    model=report["modeled_assumptions"]
-    need(report["schema"]=="mxm.csharp.reference-replay.v1" and
-         report["initial_equity_eur"]==200 and
-         report["raw_events"]==pub["bidask_events"] and
-         model["position_units"]==1000 and model["margin_eur"]<=80 and
-         model["minimum_free_margin_reserve_eur"]>=120 and
-         0<model["max_estimated_account_stop_risk_fraction"]<=.01 and
-         model["max_margin_fraction_of_free_margin"]<=.4 and
-         report["cTrader_native_backtest"] is False and
-         report["pepperstone_historical_fills_proven"] is False,
-         "OWNER_CAPITAL_OR_CAUSAL_SOURCE_NOT_BOUND")
-    # Cold verify the exact event cash ledger independently of CSharp without
-    # re-running its signal policy or using market prices for selection.
-    from decimal import Decimal
+    need(sha(quotes)==pub["csharp_input_ndjson_sha256"],"SOURCE_INPUT_SHA_BIND")
+    request_bytes=(p/"account-request.json").read_bytes()
+    need(sha(request_bytes)==pub["csharp_account_request_sha256"],"ACCOUNT_REQUEST_SHA_BIND")
+    request=json.loads(request_bytes)
+    need(request["SourceSha256"]==pub["csharp_input_ndjson_sha256"] and
+         request["ExpectedOrdinal"]==0 and request["PriorSha256"] is None,
+         "ONE_ACCOUNT_FRESH_ONLY")
+    prm=request["Parameters"]
+    need(prm["MaxMarginFraction"]<=.4 and prm["MaxPositions"]==1 and
+         prm["MinimumFreeMarginReserveEur"]>=120 and
+         prm["MaxEstimatedStopRiskFraction"]<=.01 and
+         prm["ExplicitPolicySha256"]==POLICY_SHA and
+         prm["NativeSizingScenarioSha256"]==SIZING_SHA,"OWNER_RISK_CAPITAL_CONTRACT")
+    raw=(p/"csharp"/"account-report.json").read_bytes()
+    x=json.loads(raw)
+    need(x["Schema"]=="mxm.shared-funded-account.result.v1" and
+         x["SourceSha256"]==pub["csharp_input_ndjson_sha256"] and
+         x["ExpectedOrdinal"]==0 and
+         x["NextEventOrdinal"]==len(request["Events"]) and
+         x["Orders"]==0 and x["BrokerFillsProven"] is False and
+         x["HistoricalCostsProven"] is False and x["Cloud"] is False,
+         "EXISTING_CSHARP_SOURCE_TO_ACCOUNT_BIND")
+    a=x["Account"]
+    need(a["InitialCapitalEur"]==200 and
+         a["UsedMarginEur"]<=80 and a["CompleteIsoUtcWeeks"]==0 and
+         a["Hard21Proven"] is False and
+         a["CostsBrokerVerified"] is False and
+         a["BrokerFillsProven"] is False,"UNFUNDED_OR_MISLABELED_ACCOUNT")
     cash=Decimal("200")
-    open_positions=0
-    for ev in report["ledger"]:
-        commission=Decimal(str(ev["charged_commission_eur"]))
-        if ev["kind"]=="ENTRY":
-            need(open_positions==0 and Decimal(str(ev["margin_eur"]))<=80,
-                 "POSITION_OR_MARGIN_VIOLATION")
-            need(cash-commission-Decimal(str(ev["margin_eur"]))>=120,
-                 "OWNER_FREE_RESERVE_ENTRY_VIOLATION")
-            cash-=commission;open_positions=1
-        elif ev["kind"]=="EXIT":
-            need(open_positions==1,"UNMATCHED_EXIT")
-            cash+=Decimal(str(ev["gross_price_pnl_eur"]))-commission
-            open_positions=0
-        else:need(False,"UNRECOGNIZED_LEDGER_EVENT")
-        need(abs(cash-Decimal(str(ev["balance_eur"])))<Decimal("0.00003"),
-             "INDEPENDENT_CSHARP_CASH_MISMATCH")
-    need(open_positions==0 and
-         abs(cash-Decimal(str(report["final_equity_eur"])))<Decimal("0.00003"),
-         "CONTINUOUS_ACCOUNT_RECONCILIATION")
-    need(report["economic_entries"]==report["economic_exits"]==
-         sum(1 for e in report["ledger"] if e["kind"]=="ENTRY"),
-         "ENTRY_EXIT_COUNT")
-    # CSharp completed-bar decisions must not precede the authentic M5 bar close.
-    bars=json.loads((p/"bars.json").read_text())["bars"]
-    available={row["available_no_earlier_than_utc_ms"] for row in bars}
-    for signal in report["causal_signals"]:
-        need(signal["decision_ms"] in available,
-             "DECISION_WITHOUT_CLOSED_NATIVE_M5_BAR")
-    encrypt_shard(raw,public_key=PUB,output=OUT/"csharp-ledger.mxmenc")
-    pub["csharp_report_plain_sha256"]=sha(raw)
-    pub["csharp_report_cipher_sha256"]=sha((OUT/"csharp-ledger.mxmenc").read_bytes())
-    pub["cold_cash_reconciled"]=True
-    pub["csharp_entries"]=report["economic_entries"]
-    pub["csharp_exits"]=report["economic_exits"]
-    pub["csharp_decisions"]=report["bar_decisions"]
-    pub["final_model_equity_eur"]=report["final_equity_eur"]
-    pub["model_is_not_broker_execution"]=True
-    pub["owner_qualification"]="SOURCE_TO_EXISTING_CSHARP_EXECUTED_DEVELOPMENT_ONLY"
+    entries=exits=0
+    for e in a["Ledger"]:
+        kind=e["Kind"]
+        fee=Decimal(str(e["CommissionEur"]))
+        if kind=="ENTRY":
+            need(Decimal(str(e["Units"]))==1000 and fee>=0 and
+                 cash-fee-Decimal("50")>=Decimal("120"),
+                 "OWNER_ENTRY_RESERVE_AND_BROKER_VOLUME_SCENARIO")
+            cash-=fee;entries+=1
+        elif kind=="EXIT":
+            cash+=Decimal(str(e["GrossEur"]))-fee;exits+=1
+        else:need(False,"UNAUTHORIZED_CASH_EVENT")
+        need(abs(cash-Decimal(str(e["CashEur"])))<=Decimal("0.00002"),
+             "INDEPENDENT_NATIVE_LEDGER_CASH_MISMATCH")
+    need(entries==a["AcceptedEntries"] and exits==a["ExecutedExits"] and
+         a["OpenPositions"]==0 and
+         abs(cash-Decimal(str(a["FinalCashEur"])))<=Decimal("0.00002"),
+         "CONTINUOUS_SINGLE_EUR200_CASH_CHECK")
+    need(all(Decimal(str(z["UsedMarginEur"]))<=80 for z in x["Observations"]),
+         "ACTUAL_CSHARP_ACCOUNT_MARGIN_CAP")
+    encrypt_shard(raw,public_key=PUB,output=OUT/"csharp-account.mxmenc")
+    pub.update({
+      "csharp_account_report_plain_sha256":sha(raw),
+      "csharp_account_report_encrypted_sha256":sha((OUT/"csharp-account.mxmenc").read_bytes()),
+      "existing_csharp_shared_funded_account_executed":True,
+      "cold_cash_reconciled":True,
+      "csharp_account_events":x["NextEventOrdinal"],
+      "csharp_entries":entries,"csharp_exits":exits,
+      "final_cash_eur_model":a["FinalCashEur"],
+      "owner_qualification":"AUTHENTIC_SOURCE_TO_EXISTING_CSHARP_DEVELOPMENT_ONLY",
+      "full_independent_alpha_confirmation":False})
     (OUT/"source-public.json").write_text(json.dumps(pub,sort_keys=True,indent=2)+"\n")
-    print("MXM_OWNER_R3_AUTHENTIC_TO_EXISTING_CSHARP_COLD_RECONCILED "+json.dumps({
-        "source_sha256":pub["source_plain_sha256"],
-        "csharp_report_sha256":sha(raw),"economic_entries":report["economic_entries"],
-        "account_final_model_eur":report["final_equity_eur"],
-        "no_orders":True},sort_keys=True),flush=True)
+    print("MXM_OWNER_R3_AUTHENTIC_SOURCE_TO_EXISTING_SHARED_CSHARP_RECONCILED "+json.dumps({
+      "source_sha256":pub["source_plain_sha256"],
+      "csharp_account_report_sha256":sha(raw),
+      "account_events":x["NextEventOrdinal"],"entries":entries,
+      "exits":exits,"final_cash_eur_model":a["FinalCashEur"],
+      "orders":0},sort_keys=True),flush=True)
 
 if __name__=="__main__":
     import sys
