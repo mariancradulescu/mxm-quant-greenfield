@@ -1,0 +1,54 @@
+{
+  "schema": "mxm.runtime.reception.audit.v1",
+  "recorded_date_utc": "2026-11-02",
+  "official_branch": "mxm-remediation-p0-p4-20261015-v1",
+  "official_commit_unchanged": "467fb68a965305c935806e28c08f0465620ccb45",
+  "isolated_branch": "mxm-runtime-isolated-20261102",
+  "tested_runtime_commit": "9e74fd2d20483d0d88b94b585d98a7de5e976c4f",
+  "authorized_operation_commit": "48fd891d264489703f20ffedee5cba6060a3e56c",
+  "authorized_operation_id": "MXMRO-20261102-EURUSDASIA01",
+  "historical_workflow_count_on_official": 322,
+  "active_workflow_count_on_isolated": 1,
+  "preflight_runs": [
+    {
+      "id": 41407552330,
+      "conclusion": "success"
+    },
+    {
+      "id": 41408367858,
+      "conclusion": "success",
+      "collection": "skipped"
+    },
+    {
+      "id": 41408489996,
+      "conclusion": "success",
+      "collection": "skipped"
+    }
+  ],
+  "authorized_run": {
+    "id": 41408613378,
+    "conclusion": "failure",
+    "preflight": {
+      "job_id": 125156251832,
+      "conclusion": "success"
+    },
+    "protected_collection": {
+      "job_id": 125156427998,
+      "conclusion": "failure",
+      "runner_id": 0,
+      "steps": 0,
+      "check_annotations_count": 2,
+      "exact_annotations_accessible": false
+    },
+    "environment": "mxm-r3-pepperstone-v1",
+    "environment_policy_readable_with_current_connector": false,
+    "source_authentication_attempted": false,
+    "pepperstone_market_data_collected": false,
+    "source_to_csharp_evidence_produced": false,
+    "encrypted_artifacts_count": 0,
+    "orders": 0
+  },
+  "working_hypothesis": "Protected environment rejects new unprotected isolated branch, or related environment deployment rule. Exact policy and GitHub annotations unavailable; root cause NOT verified.",
+  "safety_decision": "STOP. No rerun of this operation, no secret access, no changes to environment/branch protections, no promotion or economic claims until exact rejection reason verified.",
+  "qualification": "Source-blind integrated preflight succeeded; end-to-end authentic reception has NOT been demonstrated."
+}
